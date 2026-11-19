@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3b5bfd"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-180.png">
+<title>Lingo</title>
+<style>
+:root{--bg:#f4f6fb;--sf:#fff;--ink:#101828;--mu:#667085;--ac:#3b5bfd;--ac2:#e9edff;--ln:#e6e9f2;--me:#3b5bfd}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1017;--sf:#161b25;--ink:#e9edf5;--mu:#8b95a7;--ac:#8196ff;--ac2:#1d2540;--ln:#252c3a;--me:#4a65f0}}
+*{box-sizing:border-box;margin:0}[hidden]{display:none!important}
+html,body{height:100%}
+body{font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.app{max-width:520px;height:100dvh;margin:0 auto;display:flex;flex-direction:column;background:var(--bg)}
+section{display:none;flex:1;min-height:0;flex-direction:column}section.on{display:flex}
+header{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;background:var(--sf);border-bottom:1px solid var(--ln)}
+h1{font-size:26px;font-weight:700;letter-spacing:-.03em;flex:1}h2{font-size:17px;font-weight:650;letter-spacing:-.01em}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+button:focus-visible,label:focus-within{outline:2px solid var(--ac);outline-offset:2px}
+.btn{background:var(--ac);color:#fff;padding:13px 18px;border-radius:14px;font-weight:600;width:100%}
+.btn.alt{background:var(--ac2);color:var(--ac)}
+.ib{width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:19px;background:var(--ac2);color:var(--ac);cursor:pointer}
+input,select{font:inherit;color:inherit;width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--ln);background:var(--sf);outline:0}
+input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
+.pad{padding:20px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+.av{width:44px;height:44px;flex:none;border-radius:50%;background:var(--ac2);color:var(--ac);display:grid;place-items:center;font-weight:700;object-fit:cover}
+.pv{width:88px;height:88px;margin:4px auto;font-size:30px;cursor:pointer}
+.list{flex:1;overflow:auto}
+.row{display:flex;gap:12px;align-items:center;padding:12px 16px;width:100%;text-align:left}
+.row:hover{background:var(--sf)}.row div{min-width:0}
+.row b{display:block;font-weight:600}.row small{color:var(--mu);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{margin-left:auto;background:var(--ac);color:#fff;padding:6px 14px;border-radius:99px;font-size:14px;font-weight:600}
+.msgs{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:6px}
+.b{max-width:80%;padding:9px 13px;border-radius:18px 18px 18px 6px;background:var(--sf);border:1px solid var(--ln);align-self:flex-start;overflow-wrap:anywhere;white-space:pre-wrap}
+.b.me{align-self:flex-end;background:var(--me);border-color:var(--me);color:#fff;border-radius:18px 18px 6px 18px}
+.b img{display:block;max-width:100%;border-radius:12px;margin-bottom:4px}
+.b i{display:block;font-size:12px;font-style:normal;opacity:.6;margin-top:2px;cursor:pointer}
+.bar{display:flex;gap:8px;align-items:center;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--sf);border-top:1px solid var(--ln)}
+.bar input{border-radius:22px}
+.emo{display:none;flex-wrap:wrap;padding:8px;background:var(--sf);border-top:1px solid var(--ln)}.emo.on{display:flex}
+.emo button{font-size:24px;width:42px;height:42px;border-radius:10px}.emo button:hover{background:var(--ac2)}
+.mu{color:var(--mu);font-size:14px}.err{color:#d92d20;font-size:14px;min-height:18px}
+.sheet{position:fixed;inset:0;background:#0009;display:grid;place-items:center;z-index:9}
+.card{background:var(--sf);border-radius:24px;padding:24px;text-align:center;max-width:320px;width:86%}
+.card svg{width:100%;height:auto;border-radius:12px;background:#fff;padding:10px}
+.more{align-self:center;flex:none;background:var(--ac2);color:var(--ac);padding:6px 14px;border-radius:99px;font-size:14px}
+</style></head><body><div class="app">
+
+<section id="auth"><div class="pad" style="margin:auto 0">
+<img src="icon.svg" alt="" width="72" height="72" style="border-radius:18px"><h1 style="font-size:40px">Lingo</h1>
+<p class="mu" style="margin-bottom:12px">Chat with friends in your own language. Every message is translated for you.</p>
+<button class="btn" id="g">Continue with Google</button>
+<input id="em" type="email" placeholder="Email" autocomplete="email">
+<input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+<button class="btn alt" id="si">Sign in</button><button class="btn alt" id="su">Create account</button>
+<p class="err" id="ae"></p></div></section>
+
+<section id="setup"><header><h2 id="st"></h2></header><div class="pad">
+<label class="av pv" id="pv"><span id="pt">+</span><input id="pf" type="file" accept="image/*" hidden></label>
+<input id="nm" placeholder="Your name" maxlength="30">
+<input id="usr" placeholder="Username (letters, numbers, _)" maxlength="20" autocapitalize="none">
+<select id="lg"></select>
+<button class="btn" id="sv">Save</button>
+<button class="btn alt" id="cx">Cancel</button><button class="btn alt" id="so">Sign out</button>
+<p class="err" id="se"></p></div></section>
+
+<section id="home"><header><h1>Chats</h1><button class="ib" id="bell" title="Turn on notifications">🔔</button><button class="ib" id="mb" title="Profile">⚙</button></header>
+<div style="padding:12px 16px 4px;display:flex;gap:8px"><input id="un" placeholder="Add a friend by @username" autocapitalize="none"><button class="ib" id="add" title="Send request">＋</button></div>
+<p class="err" id="he" style="padding:0 16px"></p>
+<div class="list" id="list"></div>
+<div style="padding:12px 16px calc(12px + env(safe-area-inset-bottom))"><div style="display:flex;gap:8px"><button class="btn alt" id="inv">Copy invite link</button><button class="btn alt" id="qb" style="width:auto">QR code</button></div></div></section>
+
+<section id="chat"><header><button class="ib" id="back" title="Back">‹</button><span id="cav"></span><h2 id="cn"></h2></header>
+<div class="msgs" id="msgs"></div><div class="emo" id="emo"></div>
+<div class="bar"><label class="ib" title="Send a photo">📷<input id="ph" type="file" accept="image/*" hidden></label><button class="ib" id="eb" title="Emoji">☺</button>
+<input id="tx" placeholder="Message" autocomplete="off"><button class="ib" id="sd" style="background:var(--ac);color:#fff" title="Send">➤</button></div></section>
+</div>
+<div class="sheet" id="qr" hidden><div class="card"><div id="qrimg"></div><p class="mu" style="margin-top:14px">Friends scan this to send you a chat request. Tap anywhere to close.</p></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script type="module">
+// ---- 1. Fill in your own values (see Firebase console + Cloudflare) ----
+const CFG={firebase:{apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT.firebaseapp.com",projectId:"YOUR_PROJECT",messagingSenderId:"YOUR_SENDER_ID",appId:"YOUR_APP_ID"},vapid:"YOUR_WEB_PUSH_KEY",worker:"https://YOUR-WORKER.workers.dev"};
+const V="https://www.gstatic.com/firebasejs/10.14.1/";
+const{initializeApp}=await import(V+"firebase-app.js");
+const{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut}=await import(V+"firebase-auth.js");
+const{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,addDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,serverTimestamp,arrayUnion,writeBatch,Timestamp}=await import(V+"firebase-firestore.js");
+const{getMessaging,getToken,isSupported}=await import(V+"firebase-messaging.js");
+const app=initializeApp(CFG.firebase),auth=getAuth(app),db=getFirestore(app);
+
+const L=[["EN-US","English (US)"],["EN-GB","English (UK)"],["PT-BR","Português (Brasil)"],["PT-PT","Português (Portugal)"],["FR","Français"],["DE","Deutsch"]];
+const EMO="😀 😂 🤣 😊 😍 🥰 😎 🤔 😢 😭 😡 😮 😴 🥳 🤗 😉 👍 👎 🙏 👏 🙌 💪 👋 🤝 ❤️ 💙 🔥 ✨ 🎉 🎶 ☕ 🍕 ⚽ 🌍 🏠 🚀".split(" ");
+const $=s=>document.querySelector(s),base=l=>l.split("-")[0],key=l=>l.replace("-","_");
+const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const show=id=>document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===id));
+const emoOnly=t=>/^[\p{Extended_Pictographic}\s\u200d\ufe0f]*$/u.test(t);
+const shrink=(f,max,q)=>new Promise(r=>{const i=new Image();i.onload=()=>{const s=Math.min(1,max/Math.max(i.width,i.height)),c=h("canvas");c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);r(c.toDataURL("image/jpeg",q))};i.src=URL.createObjectURL(f)});
+const hd=async()=>({"content-type":"application/json",authorization:"Bearer "+await auth.currentUser.getIdToken()});
+const tr=async(text,target)=>{const r=await fetch(CFG.worker+"/translate",{method:"POST",headers:await hd(),body:JSON.stringify({text,target})});if(!r.ok)throw 0;return(await r.json()).text};
+L.forEach(([v,n])=>$("#lg").append(new Option(n,v)));
+EMO.forEach(e=>{const b=h("button","",e);b.onclick=()=>{$("#tx").value+=e;$("#tx").focus()};$("#emo").append(b)});
+
+let uid,me,editing=false,cur=null,unC,unM,photoData="";const U={},P={},busy=new Set();
+const user=async id=>U[id]||(U[id]={id,...(await getDoc(doc(db,"users",id))).data()});
+const av=u=>{if(u.photo){const i=h("img","av");i.src=u.photo;return i}return h("div","av",(u.name||"?")[0].toUpperCase())};
+
+// ---- Sign in ----
+const gp=new GoogleAuthProvider(),aerr=e=>$("#ae").textContent=e.message.replace("Firebase: ","");
+$("#g").onclick=()=>signInWithPopup(auth,gp).catch(aerr);
+$("#si").onclick=()=>signInWithEmailAndPassword(auth,$("#em").value,$("#pw").value).catch(aerr);
+$("#su").onclick=()=>createUserWithEmailAndPassword(auth,$("#em").value,$("#pw").value).catch(aerr);
+$("#so").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,async u=>{
+ if(!u){uid=null;unC?.();unM?.();show("auth");return}
+ uid=u.uid;const s=await getDoc(doc(db,"users",uid));
+ if(s.exists()){me=s.data();home()}else openSetup(false,{name:u.displayName||""});
+});
+
+// ---- Profile ----
+const setPv=d=>{$("#pv").style.background=d?`url(${d}) center/cover`:"";$("#pt").textContent=d?"":"+"};
+function openSetup(edit,d){editing=edit;photoData=d.photo||"";$("#nm").value=d.name||"";$("#usr").value=d.username||"";$("#usr").disabled=edit;$("#lg").value=d.lang||"EN-US";setPv(photoData);
+ $("#cx").hidden=$("#so").hidden=!edit;$("#st").textContent=edit?"Edit profile":"Set up your profile";$("#se").textContent="";show("setup")}
+$("#pf").onchange=async e=>{const f=e.target.files[0];if(f){photoData=await shrink(f,128,.8);setPv(photoData)}};
+$("#cx").onclick=()=>home();$("#mb").onclick=()=>openSetup(true,me);
+$("#sv").onclick=async()=>{
+ const name=$("#nm").value.trim(),un=$("#usr").value.trim().toLowerCase(),lang=$("#lg").value,e=$("#se");
+ if(!name)return e.textContent="Enter your name.";
+ if(!/^[a-z0-9_]{3,20}$/.test(un))return e.textContent="Username: 3–20 letters, numbers or _";
+ try{const b=writeBatch(db);
+  if(editing)b.update(doc(db,"users",uid),{name,lang,photo:photoData});
+  else{b.set(doc(db,"usernames",un),{uid});b.set(doc(db,"users",uid),{name,username:un,lang,photo:photoData,tokens:[]})}
+  await b.commit();me={tokens:[],...me,name,lang,photo:photoData,username:editing?me.username:un};delete U[uid];home();
+ }catch{e.textContent=editing?"Could not save. Try again.":"That username is taken."}
+};
+
+// ---- Chat list & friends ----
+function home(){
+ show("home");cur=null;unM?.();unC?.();
+ $("#bell").hidden=typeof Notification!=="undefined"&&Notification.permission==="granted";
+ unC=onSnapshot(query(collection(db,"chats"),where("members","array-contains",uid)),async s=>{
+  const cs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.updated?.seconds||9e9)-(a.updated?.seconds||9e9));
+  const rows=await Promise.all(cs.map(async c=>row(c,await user(c.members.find(x=>x!==uid)))));
+  $("#list").replaceChildren(...(rows.length?rows:[Object.assign(h("p","mu","No chats yet. Add a friend by username or share your invite link."),{style:"padding:20px"})]));
+ });
+ const a=new URLSearchParams(location.search).get("add");if(a){history.replaceState(0,"",location.pathname);request(a)}
+}
+function row(c,o){
+ const b=h("button","row"),t=h("div"),pend=c.status==="pending",incoming=pend&&c.from!==uid;
+ t.append(h("b","",o.name),h("small","",pend?(incoming?"Wants to chat with you":"Request sent"):c.last||"Say hi 👋"));
+ b.append(av(o),t);if(incoming)b.append(h("span","pill","Accept"));
+ b.onclick=async()=>{if(pend){if(!incoming)return;await updateDoc(doc(db,"chats",c.id),{status:"active"})}open(c,o)};
+ return b}
+async function request(un){
+ const e=$("#he");e.textContent="";un=un.trim().replace(/^@/,"").toLowerCase();if(!un)return;
+ try{const s=await getDoc(doc(db,"usernames",un));
+  if(!s.exists())return e.textContent="No one has that username.";
+  const o=s.data().uid;if(o===uid)return e.textContent="That's your own username.";
+  const id=[uid,o].sort().join("_");
+  if((await getDoc(doc(db,"chats",id))).exists())return e.textContent="You already have a chat with them.";
+  await setDoc(doc(db,"chats",id),{members:[uid,o],status:"pending",from:uid,last:"",updated:serverTimestamp()});$("#un").value="";
+ }catch{e.textContent="Could not send the request."}}
+$("#add").onclick=()=>request($("#un").value);$("#un").onkeydown=e=>e.key==="Enter"&&request($("#un").value);
+const inviteUrl=()=>location.origin+location.pathname+"?add="+me.username;
+$("#inv").onclick=async()=>{await navigator.clipboard.writeText(inviteUrl());$("#inv").textContent="Copied!";setTimeout(()=>$("#inv").textContent="Copy invite link",1500)};
+$("#qb").onclick=()=>{const q=qrcode(0,"M");q.addData(inviteUrl());q.make();$("#qrimg").innerHTML=q.createSvgTag({scalable:true});$("#qr").hidden=false};
+$("#qr").onclick=()=>$("#qr").hidden=true;
+$("#bell").onclick=async()=>{try{
+ if(!(await isSupported()))return $("#he").textContent="On iPhone: tap Share, then Add to Home Screen, and open Lingo from there.";
+ if(await Notification.requestPermission()!=="granted")return;
+ const reg=await navigator.serviceWorker.register("firebase-messaging-sw.js");
+ const t=await getToken(getMessaging(app),{vapidKey:CFG.vapid,serviceWorkerRegistration:reg});
+ await updateDoc(doc(db,"users",uid),{tokens:arrayUnion(t)});$("#bell").hidden=true;
+}catch{$("#he").textContent="Could not turn on notifications."}};
+
+// ---- Conversation ----
+async function open(c,o){
+ cur={id:c.id,o};show("chat");$("#cn").textContent=o.name;$("#cav").replaceChildren(av(o));$("#msgs").replaceChildren();$("#emo").classList.remove("on");
+ getDocs(query(collection(db,"chats",c.id,"photos"),where("expireAt","<",Timestamp.now()))).then(s=>s.forEach(d=>d.data().from===uid&&deleteDoc(d.ref))).catch(()=>{});
+ let first=true,n=50,keep=0,shown=0;
+ const sub=()=>{unM?.();unM=onSnapshot(query(collection(db,"chats",c.id,"messages"),orderBy("t","desc"),limit(n)),s=>{
+  const bx=$("#msgs"),near=bx.scrollHeight-bx.scrollTop-bx.clientHeight<90,els=s.docs.reverse().map(bubble);
+  if(s.size>=n){const mb=h("button","more","Load earlier messages");mb.onclick=()=>{keep=bx.scrollHeight-bx.scrollTop;n+=50;sub()};els.unshift(mb)}
+  bx.replaceChildren(...els);
+  if(keep&&s.size>shown){bx.scrollTop=bx.scrollHeight-keep;keep=0}else if(!keep&&(first||near))bx.scrollTop=bx.scrollHeight;
+  first=false;shown=s.size})};
+ sub();
+}
+function bubble(d){
+ const m=d.data({serverTimestamps:"estimate"}),mine=m.from===uid,b=h("div","b"+(mine?" me":""));
+ if(m.img){const i=h("img");b.append(i);photo(m.img,i,b,cur.id)}
+ if(m.text){const x=h("span","",m.text);b.append(x);
+  if(!mine&&m.lang&&base(m.lang)!==base(me.lang)&&!emoOnly(m.text)){
+   const t=m.tr?.[key(me.lang)];
+   if(t){x.textContent=t;const n=h("i","","Translated · tap for original");b.append(n);
+    n.onclick=()=>{const o=n.dataset.o;n.dataset.o=o?"":"1";x.textContent=o?t:m.text;n.textContent=o?"Translated · tap for original":"Original · tap for translation"}}
+   else{x.textContent="Translating…";x.style.opacity=.6;translate(d.ref,m,x)}}}
+ if(mine)b.onclick=e=>{
+  if(e.target.className==="del"){deleteDoc(d.ref);if(m.img)deleteDoc(doc(db,"chats",cur.id,"photos",m.img));return}
+  const x=b.querySelector(".del");if(x)x.remove();else b.append(h("i","del","Delete"))};
+ return b}
+async function translate(ref,m,x){
+ if(busy.has(ref.id))return;busy.add(ref.id);
+ try{await updateDoc(ref,{["tr."+key(me.lang)]:await tr(m.text,me.lang)})}
+ catch{x.textContent=m.text;x.style.opacity=1}finally{busy.delete(ref.id)}}
+async function photo(pid,img,b,cid){
+ if(!(pid in P))try{P[pid]=(await getDoc(doc(db,"chats",cid,"photos",pid))).data()||null}catch{P[pid]=null}
+ const p=P[pid];if(p&&p.expireAt.toMillis()>Date.now())img.src=p.data;else{img.remove();b.prepend(h("i","","Photo expired"))}}
+async function send(img){
+ const text=$("#tx").value.trim();if(!cur||(!text&&!img))return;$("#tx").value="";$("#emo").classList.remove("on");
+ const cid=cur.id,oid=cur.o.id;let pid=null;
+ try{if(img){pid=doc(collection(db,"chats",cid,"photos")).id;
+   await setDoc(doc(db,"chats",cid,"photos",pid),{from:uid,data:img,expireAt:Timestamp.fromMillis(Date.now()+15*864e5)})}
+  await addDoc(collection(db,"chats",cid,"messages"),{from:uid,text,lang:me.lang,img:pid,t:serverTimestamp()});
+  await updateDoc(doc(db,"chats",cid),{last:(pid?"📷 ":"")+text,updated:serverTimestamp()});
+  const o=(await getDoc(doc(db,"users",oid))).data();
+  if(o?.tokens?.length)fetch(CFG.worker+"/push",{method:"POST",headers:await hd(),body:JSON.stringify({tokens:o.tokens,name:me.name})}).catch(()=>{});
+ }catch{$("#tx").value=text}}
+$("#sd").onclick=()=>send();$("#tx").onkeydown=e=>e.key==="Enter"&&send();
+$("#ph").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(f)send(await shrink(f,1000,.7))};
+$("#eb").onclick=()=>$("#emo").classList.toggle("on");$("#back").onclick=()=>home();
+</script></body></html>

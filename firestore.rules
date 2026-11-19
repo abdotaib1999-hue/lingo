@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function ok() { return request.auth != null; }
+    function chat(c) { return get(/databases/$(db)/documents/chats/$(c)).data; }
+    function mem(c) { return ok() && request.auth.uid in chat(c).members; }
+
+    match /users/{u} {
+      allow read: if ok();
+      allow create: if ok() && request.auth.uid == u;
+      allow update: if ok() && request.auth.uid == u && request.resource.data.username == resource.data.username;
+    }
+    // Usernames can be created once and never changed, so each one stays unique
+    match /usernames/{n} {
+      allow read: if ok();
+      allow create: if ok() && request.resource.data.uid == request.auth.uid;
+    }
+    match /chats/{c} {
+      allow get: if ok() && (resource == null || request.auth.uid in resource.data.members);
+      allow list: if ok() && request.auth.uid in resource.data.members;
+      allow create: if ok() && request.auth.uid in request.resource.data.members
+        && request.resource.data.from == request.auth.uid && request.resource.data.status == 'pending';
+      // Only the person who was asked can accept
+      allow update: if ok() && request.auth.uid in resource.data.members
+        && (request.resource.data.status == resource.data.status || resource.data.from != request.auth.uid);
+
+      match /messages/{m} {
+        allow read: if mem(c);
+        allow create: if mem(c) && request.resource.data.from == request.auth.uid && chat(c).status == 'active';
+        // Readers may only add translations
+        allow update: if mem(c) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tr']);
+        allow delete: if mem(c) && resource.data.from == request.auth.uid;
+      }
+      match /photos/{p} {
+        allow read: if mem(c);
+        allow create: if mem(c) && request.resource.data.from == request.auth.uid;
+        allow delete: if mem(c) && resource.data.from == request.auth.uid;
+      }
+    }
+  }
+}
