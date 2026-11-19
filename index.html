@@ -57,7 +57,7 @@ input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
 <button class="btn" id="g">Continue with Google</button>
 <input id="em" type="email" placeholder="Email" autocomplete="email">
 <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
-<button class="btn alt" id="si">Sign in</button><button class="btn alt" id="su">Create account</button>
+<button class="btn alt" id="si">Sign in</button><button class="btn alt" id="su">Create account</button><button id="fp" style="color:var(--ac);padding:6px;font-size:14px">Forgot password?</button>
 <p class="err" id="ae"></p></div></section>
 
 <section id="setup"><header><h2 id="st"></h2></header><div class="pad">
@@ -89,7 +89,7 @@ input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
 const CFG={firebase:{apiKey:"AIzaSyBsdUVcHyZVkilQjcfFs4j8w5f_NFwRMGA",authDomain:"lingo-cfe8c.firebaseapp.com",projectId:"lingo-cfe8c",messagingSenderId:"973614721002",appId:"1:973614721002:web:4b82332c43c4cd18adb493"},vapid:"BN8HlTXMkg1eDtkO6cvRHPF6Iz5X_zMtHE1EMtEnAlEcOpAYEtZdDGrL-F32-x0FtqV0GAGovOu6WH9Ho7I8Ps8",worker:"https://lingo-worker.abdotaib-1999.workers.dev"};
 const V="https://www.gstatic.com/firebasejs/10.14.1/";
 const{initializeApp}=await import(V+"firebase-app.js");
-const{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut}=await import(V+"firebase-auth.js");
+const{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,sendPasswordResetEmail}=await import(V+"firebase-auth.js");
 const{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,addDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,serverTimestamp,arrayUnion,writeBatch,Timestamp,deleteField}=await import(V+"firebase-firestore.js");
 const{getMessaging,getToken,isSupported}=await import(V+"firebase-messaging.js");
 const app=initializeApp(CFG.firebase),auth=getAuth(app),db=getFirestore(app);
@@ -115,6 +115,8 @@ const gp=new GoogleAuthProvider(),aerr=e=>$("#ae").textContent=e.message.replace
 $("#g").onclick=()=>signInWithPopup(auth,gp).catch(aerr);
 $("#si").onclick=()=>signInWithEmailAndPassword(auth,$("#em").value,$("#pw").value).catch(aerr);
 $("#su").onclick=()=>createUserWithEmailAndPassword(auth,$("#em").value,$("#pw").value).catch(aerr);
+$("#fp").onclick=()=>{const e=$("#em").value.trim(),m=$("#ae");m.style.color="";if(!e)return m.textContent="Type your email above first.";
+ sendPasswordResetEmail(auth,e).then(()=>{m.style.color="var(--mu)";m.textContent="If an account exists for that email, a reset link is on its way. Check spam too."}).catch(aerr)};
 $("#so").onclick=()=>signOut(auth);
 onAuthStateChanged(auth,async u=>{
  if(!u){uid=null;unC?.();unM?.();show("auth");return}
