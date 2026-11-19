@@ -42,6 +42,13 @@ input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
 .card{background:var(--sf);border-radius:24px;padding:24px;text-align:center;max-width:320px;width:86%}
 .card svg{width:100%;height:auto;border-radius:12px;background:#fff;padding:10px}
 .more{align-self:center;flex:none;background:var(--ac2);color:var(--ac);padding:6px 14px;border-radius:99px;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--ac);margin-left:auto;flex:none}
+.act{display:flex;gap:16px;margin-top:4px}.act i{font-weight:600;opacity:.9}
+.qt{border-left:3px solid var(--ac);padding:2px 8px;margin-bottom:4px;font-size:13px;opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me .qt{border-color:#fff}
+.rp{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--ac2);color:var(--ac);font-size:14px}.rp span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note{padding:8px 16px;background:var(--ac2);color:var(--ac);font-size:14px}
+.card button{display:block;width:100%}.card button+button{margin-top:8px}
 </style></head><body><div class="app">
 
 <section id="auth"><div class="pad" style="margin:auto 0">
@@ -68,13 +75,14 @@ input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
 <div class="list" id="list"></div>
 <div style="padding:12px 16px calc(12px + env(safe-area-inset-bottom))"><div style="display:flex;gap:8px"><button class="btn alt" id="inv">Copy invite link</button><button class="btn alt" id="qb" style="width:auto">QR code</button></div></div></section>
 
-<section id="chat"><header><button class="ib" id="back" title="Back">‹</button><span id="cav"></span><h2 id="cn"></h2></header>
-<div class="msgs" id="msgs"></div><div class="emo" id="emo"></div>
-<div class="bar"><label class="ib" title="Send a photo">📷<input id="ph" type="file" accept="image/*" hidden></label><button class="ib" id="eb" title="Emoji">☺</button>
+<section id="chat"><header><button class="ib" id="back" title="Back">‹</button><span id="cav"></span><h2 id="cn" style="flex:1"></h2><button class="ib" id="mn" title="More">⋯</button></header>
+<div class="msgs" id="msgs"></div><p class="mu" id="ty" hidden style="padding:0 16px 6px"></p><p class="note" id="pz" hidden>Translation is paused (monthly limit reached). Showing original messages.</p><div class="emo" id="emo"></div><div class="rp" id="rp" hidden><span id="rpt"></span><button id="rpx" title="Cancel reply">✕</button></div><p class="note" id="bk" hidden></p>
+<div class="bar" id="bar"><label class="ib" title="Send a photo">📷<input id="ph" type="file" accept="image/*" hidden></label><button class="ib" id="eb" title="Emoji">☺</button><button class="ib" id="mic" title="Dictate">🎤</button>
 <input id="tx" placeholder="Message" autocomplete="off"><button class="ib" id="sd" style="background:var(--ac);color:#fff" title="Send">➤</button></div></section>
 </div>
 <div class="sheet" id="qr" hidden><div class="card"><div id="qrimg"></div><p class="mu" style="margin-top:14px">Friends scan this to send you a chat request. Tap anywhere to close.</p></div></div>
 
+<div class="sheet" id="mnu" hidden><div class="card"><button class="btn alt" id="blk">Block</button><button class="btn alt" id="rm">Remove chat from my list</button><button class="btn alt" id="mx">Close</button></div></div>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script type="module">
 // ---- 1. Fill in your own values (see Firebase console + Cloudflare) ----
@@ -82,11 +90,11 @@ const CFG={firebase:{apiKey:"AIzaSyBsdUVcHyZVkilQjcfFs4j8w5f_NFwRMGA",authDomain
 const V="https://www.gstatic.com/firebasejs/10.14.1/";
 const{initializeApp}=await import(V+"firebase-app.js");
 const{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut}=await import(V+"firebase-auth.js");
-const{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,addDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,serverTimestamp,arrayUnion,writeBatch,Timestamp}=await import(V+"firebase-firestore.js");
+const{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,addDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,serverTimestamp,arrayUnion,writeBatch,Timestamp,deleteField}=await import(V+"firebase-firestore.js");
 const{getMessaging,getToken,isSupported}=await import(V+"firebase-messaging.js");
 const app=initializeApp(CFG.firebase),auth=getAuth(app),db=getFirestore(app);
 
-const L=[["EN-US","English (US)"],["EN-GB","English (UK)"],["PT-BR","Português (Brasil)"],["PT-PT","Português (Portugal)"],["FR","Français"],["DE","Deutsch"]];
+const L=[["AR","العربية"],["BG","Български"],["CS","Čeština"],["DA","Dansk"],["DE","Deutsch"],["EL","Ελληνικά"],["EN-US","English (US)"],["EN-GB","English (UK)"],["ES","Español"],["ET","Eesti"],["FI","Suomi"],["FR","Français"],["HU","Magyar"],["ID","Bahasa Indonesia"],["IT","Italiano"],["JA","日本語"],["KO","한국어"],["LT","Lietuvių"],["LV","Latviešu"],["NB","Norsk"],["NL","Nederlands"],["PL","Polski"],["PT-BR","Português (Brasil)"],["PT-PT","Português (Portugal)"],["RO","Română"],["RU","Русский"],["SK","Slovenčina"],["SL","Slovenščina"],["SV","Svenska"],["TR","Türkçe"],["UK","Українська"],["ZH","中文 (简体)"]];
 const EMO="😀 😂 🤣 😊 😍 🥰 😎 🤔 😢 😭 😡 😮 😴 🥳 🤗 😉 👍 👎 🙏 👏 🙌 💪 👋 🤝 ❤️ 💙 🔥 ✨ 🎉 🎶 ☕ 🍕 ⚽ 🌍 🏠 🚀".split(" ");
 const $=s=>document.querySelector(s),base=l=>l.split("-")[0],key=l=>l.replace("-","_");
 const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
@@ -94,11 +102,11 @@ const show=id=>document.querySelectorAll("section").forEach(s=>s.classList.toggl
 const emoOnly=t=>/^[\p{Extended_Pictographic}\s\u200d\ufe0f]*$/u.test(t);
 const shrink=(f,max,q)=>new Promise(r=>{const i=new Image();i.onload=()=>{const s=Math.min(1,max/Math.max(i.width,i.height)),c=h("canvas");c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);r(c.toDataURL("image/jpeg",q))};i.src=URL.createObjectURL(f)});
 const hd=async()=>({"content-type":"application/json",authorization:"Bearer "+await auth.currentUser.getIdToken()});
-const tr=async(text,target)=>{const r=await fetch(CFG.worker+"/translate",{method:"POST",headers:await hd(),body:JSON.stringify({text,target})});if(!r.ok)throw 0;return(await r.json()).text};
+const tr=async(text,target)=>{const r=await fetch(CFG.worker+"/translate",{method:"POST",headers:await hd(),body:JSON.stringify({text,target})});if(r.status===429)throw"quota";if(!r.ok)throw 0;const j=await r.json();return{text:j.text,src:j.src||""}};
 L.forEach(([v,n])=>$("#lg").append(new Option(n,v)));
 EMO.forEach(e=>{const b=h("button","",e);b.onclick=()=>{$("#tx").value+=e;$("#tx").focus()};$("#emo").append(b)});
 
-let uid,me,editing=false,cur=null,unC,unM,photoData="";const U={},P={},busy=new Set();
+let uid,me,editing=false,cur=null,unC,unM,photoData="";const U={},P={},busy=new Set();let unT,replyTo=null,paused=false,lastT=0;
 const user=async id=>U[id]||(U[id]={id,...(await getDoc(doc(db,"users",id))).data()});
 const av=u=>{if(u.photo){const i=h("img","av");i.src=u.photo;return i}return h("div","av",(u.name||"?")[0].toUpperCase())};
 
@@ -133,10 +141,10 @@ $("#sv").onclick=async()=>{
 
 // ---- Chat list & friends ----
 function home(){
- show("home");cur=null;unM?.();unC?.();
+ show("home");cur=null;unM?.();unC?.();unT?.();
  $("#bell").hidden=typeof Notification!=="undefined"&&Notification.permission==="granted";
  unC=onSnapshot(query(collection(db,"chats"),where("members","array-contains",uid)),async s=>{
-  const cs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.updated?.seconds||9e9)-(a.updated?.seconds||9e9));
+  const cs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.updated?.seconds||9e9)-(a.updated?.seconds||9e9)).filter(c=>{const hs=c.hidden?.[uid]?.seconds;return!(hs&&(c.updated?.seconds||0)<=hs)});
   const rows=await Promise.all(cs.map(async c=>row(c,await user(c.members.find(x=>x!==uid)))));
   $("#list").replaceChildren(...(rows.length?rows:[Object.assign(h("p","mu","No chats yet. Add a friend by username or share your invite link."),{style:"padding:20px"})]));
  });
@@ -145,7 +153,7 @@ function home(){
 function row(c,o){
  const b=h("button","row"),t=h("div"),pend=c.status==="pending",incoming=pend&&c.from!==uid;
  t.append(h("b","",o.name),h("small","",pend?(incoming?"Wants to chat with you":"Request sent"):c.last||"Say hi 👋"));
- b.append(av(o),t);if(incoming)b.append(h("span","pill","Accept"));
+ b.append(av(o),t);if(incoming)b.append(h("span","pill","Accept"));if(c.lastFrom&&c.lastFrom!==uid&&(c.updated?.seconds||0)>(c.seen?.[uid]?.seconds||0))b.append(h("span","dot"));
  b.onclick=async()=>{if(pend){if(!incoming)return;await updateDoc(doc(db,"chats",c.id),{status:"active"})}open(c,o)};
  return b}
 async function request(un){
@@ -172,34 +180,47 @@ $("#bell").onclick=async()=>{try{
 
 // ---- Conversation ----
 async function open(c,o){
- cur={id:c.id,o};show("chat");$("#cn").textContent=o.name;$("#cav").replaceChildren(av(o));$("#msgs").replaceChildren();$("#emo").classList.remove("on");
+ cur={id:c.id,o,blocked:""};replyTo=null;$("#rp").hidden=true;$("#ty").hidden=true;show("chat");$("#cn").textContent=o.name;$("#cav").replaceChildren(av(o));$("#msgs").replaceChildren();$("#emo").classList.remove("on");
+ const cref=doc(db,"chats",c.id),seen=()=>updateDoc(cref,{["seen."+uid]:serverTimestamp()}).catch(()=>{});
  getDocs(query(collection(db,"chats",c.id,"photos"),where("expireAt","<",Timestamp.now()))).then(s=>s.forEach(d=>d.data().from===uid&&deleteDoc(d.ref))).catch(()=>{});
- let first=true,n=50,keep=0,shown=0;
+ let first=true,n=50,keep=0,shown=0,tm;unT?.();
+ unT=onSnapshot(cref,s=>{const d=s.data({serverTimestamps:"estimate"});if(!d)return;
+  cur.blocked=d.blocked||"";$("#bar").hidden=!!cur.blocked;$("#bk").hidden=!cur.blocked;
+  $("#bk").textContent=cur.blocked===uid?"You blocked this person. Unblock from the ⋯ menu.":"You can't reply in this chat.";
+  const t=d.typing?.[o.id]?.toMillis?.(),ty=$("#ty");clearTimeout(tm);
+  if(t&&Date.now()-t<5000){ty.textContent=o.name+" is typing…";ty.hidden=false;tm=setTimeout(()=>ty.hidden=true,5000)}else ty.hidden=true});
  const sub=()=>{unM?.();unM=onSnapshot(query(collection(db,"chats",c.id,"messages"),orderBy("t","desc"),limit(n)),s=>{
-  const bx=$("#msgs"),near=bx.scrollHeight-bx.scrollTop-bx.clientHeight<90,els=s.docs.reverse().map(bubble);
+  const bx=$("#msgs"),near=bx.scrollHeight-bx.scrollTop-bx.clientHeight<90,ds=s.docs.reverse(),els=ds.map(bubble);
   if(s.size>=n){const mb=h("button","more","Load earlier messages");mb.onclick=()=>{keep=bx.scrollHeight-bx.scrollTop;n+=50;sub()};els.unshift(mb)}
   bx.replaceChildren(...els);
   if(keep&&s.size>shown){bx.scrollTop=bx.scrollHeight-keep;keep=0}else if(!keep&&(first||near))bx.scrollTop=bx.scrollHeight;
+  if(ds.length&&ds[ds.length-1].data().from!==uid)seen();
   first=false;shown=s.size})};
  sub();
 }
 function bubble(d){
- const m=d.data({serverTimestamps:"estimate"}),mine=m.from===uid,b=h("div","b"+(mine?" me":""));
- if(m.img){const i=h("img");b.append(i);photo(m.img,i,b,cur.id)}
- if(m.text){const x=h("span","",m.text);b.append(x);
+ const m=d.data({serverTimestamps:"estimate"}),mine=m.from===uid,b=h("div","b"+(mine?" me":"")),cid=cur.id;let x=null;
+ if(m.re)b.append(h("div","qt",m.re));
+ if(m.img){const i=h("img");b.append(i);photo(m.img,i,b,cid)}
+ if(m.text){x=h("span","",m.text);x.dir="auto";b.append(x);
   if(!mine&&m.lang&&base(m.lang)!==base(me.lang)&&!emoOnly(m.text)){
    const t=m.tr?.[key(me.lang)];
-   if(t){x.textContent=t;const n=h("i","","Translated · tap for original");b.append(n);
-    n.onclick=()=>{const o=n.dataset.o;n.dataset.o=o?"":"1";x.textContent=o?t:m.text;n.textContent=o?"Translated · tap for original":"Original · tap for translation"}}
-   else{x.textContent="Translating…";x.style.opacity=.6;translate(d.ref,m,x)}}}
- if(mine)b.onclick=e=>{
-  if(e.target.className==="del"){deleteDoc(d.ref);if(m.img)deleteDoc(doc(db,"chats",cur.id,"photos",m.img));return}
-  const x=b.querySelector(".del");if(x)x.remove();else b.append(h("i","del","Delete"))};
+   if(t){if(!(m.src&&base(m.src)===base(me.lang))){
+     const nm=m.src?" from "+(L.find(l=>base(l[0])===m.src)?.[1]||m.src).replace(/ \(.*\)/,""):"",lbl="Translated"+nm+" · tap for original",n=h("i","",lbl);
+     x.textContent=t;b.append(n);
+     n.onclick=e=>{e.stopPropagation();const o=n.dataset.o;n.dataset.o=o?"":"1";x.textContent=o?t:m.text;n.textContent=o?lbl:"Original · tap for translation"}}}
+   else if(!paused){x.textContent="Translating…";x.style.opacity=.6;translate(d.ref,m,x)}}}
+ const act=h("div","act");act.hidden=true;
+ const add=(s,f)=>{const a=h("i","",s);a.onclick=e=>{e.stopPropagation();f()};act.append(a)};
+ add("Reply",()=>{replyTo=(m.text||"📷 Photo").slice(0,100);$("#rpt").textContent=replyTo;$("#rp").hidden=false;$("#tx").focus()});
+ if(x&&!mine)add("Listen",()=>speak(x.textContent));
+ if(mine)add("Delete",()=>{deleteDoc(d.ref);if(m.img)deleteDoc(doc(db,"chats",cid,"photos",m.img))});
+ b.append(act);b.onclick=()=>act.hidden=!act.hidden;
  return b}
 async function translate(ref,m,x){
  if(busy.has(ref.id))return;busy.add(ref.id);
- try{await updateDoc(ref,{["tr."+key(me.lang)]:await tr(m.text,me.lang)})}
- catch{x.textContent=m.text;x.style.opacity=1}finally{busy.delete(ref.id)}}
+ try{const r=await tr(m.text,me.lang);await updateDoc(ref,{["tr."+key(me.lang)]:r.text,src:r.src})}
+ catch(e){x.textContent=m.text;x.style.opacity=1;if(e==="quota"){paused=true;$("#pz").hidden=false}}finally{busy.delete(ref.id)}}
 async function photo(pid,img,b,cid){
  if(!(pid in P))try{P[pid]=(await getDoc(doc(db,"chats",cid,"photos",pid))).data()||null}catch{P[pid]=null}
  const p=P[pid];if(p&&p.expireAt.toMillis()>Date.now())img.src=p.data;else{img.remove();b.prepend(h("i","","Photo expired"))}}
@@ -208,12 +229,23 @@ async function send(img){
  const cid=cur.id,oid=cur.o.id;let pid=null;
  try{if(img){pid=doc(collection(db,"chats",cid,"photos")).id;
    await setDoc(doc(db,"chats",cid,"photos",pid),{from:uid,data:img,expireAt:Timestamp.fromMillis(Date.now()+15*864e5)})}
-  await addDoc(collection(db,"chats",cid,"messages"),{from:uid,text,lang:me.lang,img:pid,t:serverTimestamp()});
-  await updateDoc(doc(db,"chats",cid),{last:(pid?"📷 ":"")+text,updated:serverTimestamp()});
+  await addDoc(collection(db,"chats",cid,"messages"),{from:uid,text,lang:me.lang,img:pid,t:serverTimestamp(),...(replyTo?{re:replyTo}:{})});
+  await updateDoc(doc(db,"chats",cid),{last:(pid?"📷 ":"")+text,updated:serverTimestamp(),lastFrom:uid});replyTo=null;$("#rp").hidden=true;
   const o=(await getDoc(doc(db,"users",oid))).data();
   if(o?.tokens?.length)fetch(CFG.worker+"/push",{method:"POST",headers:await hd(),body:JSON.stringify({tokens:o.tokens,name:me.name})}).catch(()=>{});
  }catch{$("#tx").value=text}}
 $("#sd").onclick=()=>send();$("#tx").onkeydown=e=>{if(e.key==="Enter")send()};
 $("#ph").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(f)send(await shrink(f,1000,.7))};
 $("#eb").onclick=()=>$("#emo").classList.toggle("on");$("#back").onclick=()=>home();
+$("#tx").dir="auto";
+const bcp=l=>({NB:"nb-NO",ZH:"zh-CN"}[l]||l).replace(/^[A-Z]+/,x=>x.toLowerCase());
+const speak=t=>{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=bcp(me.lang);speechSynthesis.speak(u)};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;$("#mic").hidden=!SR;
+$("#mic").onclick=()=>{const r=new SR();r.lang=bcp(me.lang);r.onresult=e=>{$("#tx").value+=($("#tx").value?" ":"")+e.results[0][0].transcript};r.onend=()=>$("#mic").style.opacity=1;$("#mic").style.opacity=.5;r.start()};
+$("#tx").oninput=()=>{if(cur&&Date.now()-lastT>3000){lastT=Date.now();updateDoc(doc(db,"chats",cur.id),{["typing."+uid]:serverTimestamp()}).catch(()=>{})}};
+$("#rpx").onclick=()=>{replyTo=null;$("#rp").hidden=true};
+$("#mn").onclick=()=>{$("#blk").textContent=cur.blocked===uid?"Unblock":"Block";$("#blk").hidden=!!cur.blocked&&cur.blocked!==uid;$("#mnu").hidden=false};
+$("#mx").onclick=()=>$("#mnu").hidden=true;
+$("#blk").onclick=async()=>{await updateDoc(doc(db,"chats",cur.id),{blocked:cur.blocked===uid?deleteField():uid}).catch(()=>{});$("#mnu").hidden=true};
+$("#rm").onclick=async()=>{await updateDoc(doc(db,"chats",cur.id),{["hidden."+uid]:serverTimestamp()}).catch(()=>{});$("#mnu").hidden=true;home()};
 </script></body></html>
