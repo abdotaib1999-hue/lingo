@@ -157,7 +157,7 @@ async function request(un){
   if((await getDoc(doc(db,"chats",id))).exists())return e.textContent="You already have a chat with them.";
   await setDoc(doc(db,"chats",id),{members:[uid,o],status:"pending",from:uid,last:"",updated:serverTimestamp()});$("#un").value="";
  }catch{e.textContent="Could not send the request."}}
-$("#add").onclick=()=>request($("#un").value);$("#un").onkeydown=e=>e.key==="Enter"&&request($("#un").value);
+$("#add").onclick=()=>request($("#un").value);$("#un").onkeydown=e=>{if(e.key==="Enter")request($("#un").value)};
 const inviteUrl=()=>location.origin+location.pathname+"?add="+me.username;
 $("#inv").onclick=async()=>{await navigator.clipboard.writeText(inviteUrl());$("#inv").textContent="Copied!";setTimeout(()=>$("#inv").textContent="Copy invite link",1500)};
 $("#qb").onclick=()=>{const q=qrcode(0,"M");q.addData(inviteUrl());q.make();$("#qrimg").innerHTML=q.createSvgTag({scalable:true});$("#qr").hidden=false};
@@ -213,7 +213,7 @@ async function send(img){
   const o=(await getDoc(doc(db,"users",oid))).data();
   if(o?.tokens?.length)fetch(CFG.worker+"/push",{method:"POST",headers:await hd(),body:JSON.stringify({tokens:o.tokens,name:me.name})}).catch(()=>{});
  }catch{$("#tx").value=text}}
-$("#sd").onclick=()=>send();$("#tx").onkeydown=e=>e.key==="Enter"&&send();
+$("#sd").onclick=()=>send();$("#tx").onkeydown=e=>{if(e.key==="Enter")send()};
 $("#ph").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(f)send(await shrink(f,1000,.7))};
 $("#eb").onclick=()=>$("#emo").classList.toggle("on");$("#back").onclick=()=>home();
 </script></body></html>
