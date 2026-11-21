@@ -105,6 +105,16 @@ header{position:relative;z-index:6;margin:calc(env(safe-area-inset-top) + 8px) 1
 .rp .ib{width:32px;height:32px;flex:none}.rp .ib svg{width:16px;height:16px;margin:-8px 0 0 -8px}
 #sd{background:linear-gradient(165deg,color-mix(in srgb,var(--me) 84%,#fff),var(--me))!important;color:#fff}
 .rx{cursor:pointer}
+.badge{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--ac);color:#fff;font-size:12px;font-weight:700;line-height:22px;text-align:center}
+.b.nxt .tm{display:block}.b.nxt:not(.me) .tm{display:none}
+#mnu .card{max-height:90vh;overflow:auto;text-align:start}.inf .av{width:84px;height:84px;font-size:30px;margin:0 auto}.inf small{display:block}
+.tg{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 4px;font-weight:600}.tg input{width:auto}
+.swr{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}.gal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:zoom-in}
+.ag{display:flex;justify-content:space-around;gap:10px}.ag button{width:auto!important;display:flex!important;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}.ag button+button{margin-top:0!important}.ag .ib{width:52px;height:52px}
+.kp{display:grid;grid-template-columns:repeat(3,72px);gap:14px;justify-content:center;margin:10px 0}.kp button{width:72px!important;height:72px;border-radius:50%;font-size:26px;font-weight:600;background:var(--gl2);border:1px solid var(--glb)}.kp button+button{margin-top:0!important}
+.dotp{width:14px;height:14px;border-radius:50%;border:2px solid var(--ac)}.dotp.f{background:var(--ac)}
+#att{z-index:12}#intro{z-index:30}#vw{z-index:20}
 </style></head><body><div class="app">
 
 <section id="auth"><div class="pad" style="margin:auto 0">
@@ -125,6 +135,9 @@ header{position:relative;z-index:6;margin:calc(env(safe-area-inset-top) + 8px) 1
 <div id="sw" style="display:flex;gap:10px;flex-wrap:wrap"></div>
 <select id="ts"><option value="15">Small</option><option value="16">Normal</option><option value="18">Large</option></select>
 <label class="mu" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="both" style="width:auto"><span>Show original under translations</span></label>
+<p class="mu" style="margin-top:6px">App lock</p>
+<button class="btn alt" id="lk">Set up app lock</button>
+<label class="mu" id="fpl" style="display:flex;gap:8px;align-items:center" hidden><input type="checkbox" id="fpid" style="width:auto"><span>Unlock with fingerprint</span></label>
 <button class="btn" id="sv">Save</button>
 <button class="btn alt" id="cx">Cancel</button><button class="btn alt" id="so">Sign out</button>
 <p class="err" id="se"></p></div></section>
@@ -137,14 +150,25 @@ header{position:relative;z-index:6;margin:calc(env(safe-area-inset-top) + 8px) 1
 
 <section id="chat"><header><button class="ib" id="back" title="Back" data-i="left"></button><span id="cav"></span><div style="flex:1;min-width:0"><h2 id="cn"></h2><small class="mu" id="cl"></small></div><button class="ib" id="mn" title="More" data-i="more"></button></header>
 <div class="msgs" id="msgs"></div><p class="mu" id="ty" hidden style="padding:0 16px 6px"></p><p class="note" id="pz" hidden>Translation is paused (monthly limit reached). Showing original messages.</p><p class="note" id="tip" hidden style="cursor:pointer">Tip: short, clear sentences translate best. Tap a message for Reply, React and Listen. (Tap here to dismiss)</p><div class="emo" id="emo"></div><div class="rp" id="rp" hidden><span id="rpt"></span><button class="ib" id="rpx" title="Cancel reply" data-i="x"></button></div><p class="note" id="bk" hidden></p>
-<div class="bar" id="bar"><label class="ib" title="Send a photo"><span data-i="image"></span><input id="ph" type="file" accept="image/*" hidden></label><button class="ib" id="eb" title="Emoji" data-i="smile"></button><button class="ib" id="mic" title="Dictate" data-i="mic"></button>
-<input id="tx" placeholder="Message" autocomplete="off"><button class="ib" id="sd" style="background:var(--ac);color:#fff" title="Send" data-i="send"></button></div></section>
+<div class="bar" id="bar"><button class="ib" id="pl" title="Attach" data-i="plus"></button><input id="tx" placeholder="Message" autocomplete="off"><button class="ib" id="eb" title="Emoji" data-i="smile"></button><button class="ib" id="sd" style="background:var(--ac);color:#fff" title="Send" data-i="mic"></button></div></section>
 <div id="empty"><img src="icon.svg" alt="" width="88" height="88" style="border-radius:22px"><p class="mu">Select a chat to start talking</p></div>
 </div>
 <div class="sheet" id="qr" hidden><div class="card"><div id="qrimg"></div><p class="mu" style="margin-top:14px">Friends scan this to send you a chat request. Tap anywhere to close.</p></div></div>
 
 <div class="sheet" id="vw" hidden><img id="vwi" alt="" style="max-width:96%;max-height:92%;border-radius:10px"></div>
-<div class="sheet" id="mnu" hidden><div class="card"><button class="btn alt" id="blk">Block</button><button class="btn alt" id="rm">Remove chat from my list</button><button class="btn alt" id="mx">Close</button></div></div>
+<div class="sheet" id="mnu" hidden><div class="card inf"><div id="ia"></div>
+<label class="tg"><span>Mute notifications</span><input type="checkbox" id="mute"></label>
+<p class="mu">Chat color</p><div class="swr" id="cs"></div>
+<p class="mu">Wallpaper</p><div class="swr" id="ws"></div>
+<button class="btn alt" id="shp">Shared photos</button><div class="gal" id="gal"></div>
+<button class="btn alt" id="blk">Block</button><button class="btn alt" id="rm">Remove chat from my list</button><button class="btn alt" id="mx">Close</button></div></div>
+<div class="sheet" id="att" hidden style="place-items:end center"><div class="card" style="margin-bottom:96px;padding:18px"><div class="ag">
+<button id="a1"><span class="ib" data-i="camera"></span><small>Camera</small></button>
+<button id="a2"><span class="ib" data-i="image"></span><small>Gallery</small></button>
+<button id="a3"><span class="ib" data-i="pin"></span><small>My Location</small></button></div>
+<input id="cam" type="file" accept="image/*" capture="environment" hidden><input id="ph" type="file" accept="image/*" hidden></div></div>
+<div class="sheet" id="intro" hidden><div class="card"><p id="it" style="font-size:18px;font-weight:600;margin:6px 0 16px"></p><div id="iw" class="swr" style="justify-content:center"></div><button class="btn" id="in" style="margin-top:14px"></button></div></div>
+<div class="sheet" id="lock" hidden style="background:var(--bg);z-index:99"><div class="card" style="background:transparent;box-shadow:none;border:0;-webkit-backdrop-filter:none;backdrop-filter:none"><img src="icon.svg" alt="" width="64" height="64" style="border-radius:16px"><p id="lt" style="font-size:18px;font-weight:600;margin:12px 0 6px"></p><div id="ld" class="swr" style="justify-content:center;margin-bottom:6px"></div><p class="err" id="le"></p><div id="kp" class="kp"></div><button class="btn alt" id="lf" hidden>Use fingerprint</button><button id="lo" class="mu" style="padding:10px" hidden>Forgot PIN? Sign out</button><button id="lc" class="mu" style="padding:10px" hidden>Cancel</button></div></div>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script type="module">
 // ---- 1. Fill in your own values (see Firebase console + Cloudflare) ----
@@ -152,7 +176,7 @@ const CFG={firebase:{apiKey:"AIzaSyBsdUVcHyZVkilQjcfFs4j8w5f_NFwRMGA",authDomain
 const V="https://www.gstatic.com/firebasejs/10.14.1/";
 const{initializeApp}=await import(V+"firebase-app.js");
 const{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,sendPasswordResetEmail}=await import(V+"firebase-auth.js");
-const{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,addDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,serverTimestamp,arrayUnion,writeBatch,Timestamp,deleteField}=await import(V+"firebase-firestore.js");
+const{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,addDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,serverTimestamp,arrayUnion,writeBatch,Timestamp,deleteField,increment}=await import(V+"firebase-firestore.js");
 const{getMessaging,getToken,isSupported}=await import(V+"firebase-messaging.js");
 const app=initializeApp(CFG.firebase),auth=getAuth(app),db=getFirestore(app);
 
@@ -167,6 +191,7 @@ const hd=async()=>({"content-type":"application/json",authorization:"Bearer "+aw
 const tr=async(text,target)=>{const r=await fetch(CFG.worker+"/translate",{method:"POST",headers:await hd(),body:JSON.stringify({texts:text.split("\n"),target})});if(r.status===429)throw"quota";if(!r.ok)throw 0;const j=await r.json();return{text:j.texts.join("\n"),src:j.src||""}};
 L.forEach(([v,n])=>$("#lg").append(new Option(n,v)));
 const IC={bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',left:'<path d="m15 18-6-6 6-6"/>',more:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',image:'<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/>',mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'};
+IC.camera='<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>';IC.pin='<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>';
 document.querySelectorAll("[data-i]").forEach(e=>e.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[e.dataset.i]+"</svg>");
 const T=[
 ["Chat with friends in your own language. Every message is translated for you.","Converse com amigos no seu idioma. Cada mensagem é traduzida para você.","Discutez avec vos amis dans votre langue. Chaque message est traduit pour vous.","Chatte mit Freunden in deiner Sprache. Jede Nachricht wird für dich übersetzt."],
@@ -215,7 +240,13 @@ const T=[
 ["Unblock","Desbloquear","Débloquer","Entblocken"],["Block","Bloquear","Bloquer","Blockieren"],
 ["Search chats or add by @username"],["Appearance"],["Small"],["Normal"],["Large"],["Show original under translations"],["Seen"],["React"],
 ["Tip: short, clear sentences translate best. Tap a message for Reply, React and Listen. (Tap here to dismiss)"],
-["Remove"],["Tap to remove your reaction"]
+["Remove"],["Tap to remove your reaction"],
+["Attach"],["Camera"],["Gallery"],["My Location"],["Share your current location with this chat?"],["📍 Open location"],
+["Mute notifications"],["Chat color"],["Wallpaper"],["Shared photos"],["Loading…"],["No photos yet"],
+["Write in your language. Your friend reads it in theirs."],["Tap a message to reply, react or listen. Swipe right to reply."],
+["Install Lingo: on iPhone tap Share, then Add to Home Screen. On Android tap Install."],["Next"],["Done"],
+["App lock"],["Set up app lock"],["Turn off app lock"],["Unlock with fingerprint"],["Use fingerprint"],["Forgot PIN? Sign out"],
+["Enter PIN"],["Create a 4-digit PIN"],["Confirm your PIN"],["PINs don't match. Try again."],["Wrong PIN"],["Too many tries. Try again later."]
 ];
 const DICT={PT:{},FR:{},DE:{}};T.forEach(r=>{DICT.PT[r[0]]=r[1];DICT.FR[r[0]]=r[2];DICT.DE[r[0]]=r[3]});
 let UIL="EN";const _=s=>DICT[UIL]?.[s]||s,EN=new Set(T.map(r=>r[0])),reg=[];
@@ -236,8 +267,8 @@ $("#ts").onchange=()=>{PR.ts=+$("#ts").value;savePR()};$("#both").onchange=()=>{
 $("#tip").onclick=()=>{PR.tip=1;savePR();$("#tip").hidden=true};
 $("#vw").onclick=()=>$("#vw").hidden=true;
 $("#un").oninput=()=>{const q=$("#un").value.trim().replace(/^@/,"").toLowerCase();$("#list").querySelectorAll(".row").forEach(r=>r.hidden=!!q&&!(r.dataset.n||"").includes(q))};
-const post=bx=>{const a=[...bx.children];a.forEach((e,i)=>{const f=e.dataset.f;e.classList.toggle("cont",!!f&&a[i-1]?.dataset.f===f);e.classList.toggle("nxt",!!f&&a[i+1]?.dataset.f===f)});
- const l=a.reverse().find(e=>e.dataset.f===uid);if(l&&cur?.seen&&cur.seen>=+l.dataset.t)l.append(h("small","tm sn",_("Seen")))};
+const post=bx=>{const a=[...bx.children];a.forEach((e,i)=>{const f=e.dataset.f;e.classList.toggle("cont",!!f&&a[i-1]?.dataset.f===f);e.classList.toggle("nxt",!!f&&a[i+1]?.dataset.f===f);
+ if(f===uid&&e.dataset.t){const tm=e.querySelector(".tm");if(tm)tm.textContent=hm(+e.dataset.t)+" "+(cur?.seen>=+e.dataset.t?"✓✓":"✓")}})};
 let uiTok=0;
 async function fetchUI(lang){
  if(!lang||!auth.currentUser)return;const u=base(lang).toUpperCase();if(u==="EN")return;const tok=++uiTok,ck="ui2_"+u;
@@ -251,7 +282,7 @@ async function fetchUI(lang){
 const dayLbl=ms=>{const d=new Date(ms),n=new Date(),same=(a,b)=>a.toDateString()===b.toDateString();return same(d,n)?_("Today"):same(d,new Date(Date.now()-864e5))?_("Yesterday"):d.toLocaleDateString(loc(),{day:"numeric",month:"short",year:d.getFullYear()===n.getFullYear()?undefined:"numeric"})};
 const hm=ms=>new Date(ms).toLocaleTimeString(loc(),{hour:"2-digit",minute:"2-digit"});
 const lt=ts=>{const ms=ts?.toMillis?.(),l=ms&&dayLbl(ms);return!ms?"":l===_("Today")?hm(ms):l};
-EMO.forEach(e=>{const b=h("button","",e);b.onclick=()=>{$("#tx").value+=e;$("#tx").focus()};$("#emo").append(b)});
+EMO.forEach(e=>{const b=h("button","",e);b.onclick=()=>{$("#tx").value+=e;$("#tx").focus();setSd()};$("#emo").append(b)});
 
 let uid,me,editing=false,cur=null,unC,unM,photoData="";const U={},P={},busy=new Set();let unT,replyTo=null,paused=false,lastT=0;
 const user=async id=>U[id]||(U[id]={id,...(await getDoc(doc(db,"users",id))).data()});
@@ -274,7 +305,7 @@ onAuthStateChanged(auth,async u=>{
 // ---- Profile ----
 const setPv=d=>{$("#pv").style.background=d?`url(${d}) center/cover`:"";$("#pt").textContent=d?"":"+"};
 function openSetup(edit,d){editing=edit;photoData=d.photo||"";$("#nm").value=d.name||"";$("#usr").value=d.username||"";$("#usr").disabled=edit;$("#lg").value=d.lang||"EN-US";setPv(photoData);
- $("#cx").hidden=$("#so").hidden=!edit;$("#st").textContent=edit?_("Edit profile"):_("Set up your profile");$("#se").textContent="";show("setup")}
+ $("#cx").hidden=$("#so").hidden=!edit;$("#st").textContent=edit?_("Edit profile"):_("Set up your profile");$("#se").textContent="";show("setup");lockUI()}
 $("#pf").onchange=async e=>{const f=e.target.files[0];if(f){photoData=await shrink(f,128,.8);setPv(photoData)}};
 $("#cx").onclick=()=>home();$("#lg").onchange=()=>{setUI($("#lg").value);fetchUI($("#lg").value);$("#st").textContent=_(editing?"Edit profile":"Set up your profile")};$("#mb").onclick=()=>openSetup(true,me);
 $("#sv").onclick=async()=>{
@@ -290,7 +321,7 @@ $("#sv").onclick=async()=>{
 
 // ---- Chat list & friends ----
 function home(){
- setUI(me.lang);fetchUI(me.lang);show("home");cur=null;unM?.();unC?.();unT?.();
+ setUI(me.lang);fetchUI(me.lang);lockCheck();if(!PR.intro&&$("#intro").hidden)showIntro();show("home");cur=null;unM?.();unC?.();unT?.();
  $("#bell").hidden=typeof Notification!=="undefined"&&Notification.permission==="granted";
  unC=onSnapshot(query(collection(db,"chats"),where("members","array-contains",uid)),async s=>{
   const cs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.updated?.seconds||9e9)-(a.updated?.seconds||9e9)).filter(c=>{const hs=c.hidden?.[uid]?.seconds;return!(hs&&(c.updated?.seconds||0)<=hs)});
@@ -302,7 +333,7 @@ function home(){
 function row(c,o){
  const b=h("button","row"),t=h("div"),pend=c.status==="pending",incoming=pend&&c.from!==uid;
  t.append(h("b","",o.name),h("small","",pend?(incoming?_("Wants to chat with you"):_("Request sent")):c.last||_("Say hi 👋")));
- const r=h("div","rc");r.append(h("small","",lt(c.updated)));if(incoming)r.append(h("span","pill",_("Accept")));if(c.lastFrom&&c.lastFrom!==uid&&(c.updated?.seconds||0)>(c.seen?.[uid]?.seconds||0))r.append(h("span","dot"));b.dataset.n=(o.name||"").toLowerCase();b.append(av(o),t,r);
+ const r=h("div","rc");r.append(h("small","",lt(c.updated)));if(incoming)r.append(h("span","pill",_("Accept")));const un=c.unread?.[uid]||0;if(un)r.append(h("span","badge",un>99?"99+":String(un)));b.dataset.n=(o.name||"").toLowerCase();b.append(av(o),t,r);
  b.onclick=async()=>{if(pend){if(!incoming)return;await updateDoc(doc(db,"chats",c.id),{status:"active"})}open(c,o)};
  return b}
 async function request(un){
@@ -329,12 +360,12 @@ $("#bell").onclick=async()=>{try{
 
 // ---- Conversation ----
 async function open(c,o){
- cur={id:c.id,o,blocked:""};replyTo=null;$("#rp").hidden=true;$("#ty").hidden=true;$("#tip").hidden=!!PR.tip;show("chat");$("#cn").textContent=o.name;$("#cl").textContent=L.find(l=>l[0]===o.lang)?.[1]||"";$("#cav").replaceChildren(av(o));$("#msgs").replaceChildren();$("#emo").classList.remove("on");
- const cref=doc(db,"chats",c.id),seen=()=>updateDoc(cref,{["seen."+uid]:serverTimestamp()}).catch(()=>{});
+ cur={id:c.id,o,blocked:""};replyTo=null;$("#rp").hidden=true;$("#ty").hidden=true;$("#tip").hidden=!!PR.tip;show("chat");applyChat(c.id);$("#cn").textContent=o.name;$("#cl").textContent=L.find(l=>l[0]===o.lang)?.[1]||"";$("#cav").replaceChildren(av(o));$("#msgs").replaceChildren();$("#emo").classList.remove("on");
+ const cref=doc(db,"chats",c.id),seen=()=>updateDoc(cref,{["seen."+uid]:serverTimestamp(),["unread."+uid]:0}).catch(()=>{});
  getDocs(query(collection(db,"chats",c.id,"photos"),where("expireAt","<",Timestamp.now()))).then(s=>s.forEach(d=>d.data().from===uid&&deleteDoc(d.ref))).catch(()=>{});
  let first=true,n=50,keep=0,shown=0,tm;unT?.();
  unT=onSnapshot(cref,s=>{const d=s.data({serverTimestamps:"estimate"});if(!d)return;
-  cur.blocked=d.blocked||"";cur.seen=d.seen?.[o.id]?.toMillis?.()||0;{const bx=$("#msgs");bx.querySelectorAll(".sn").forEach(e=>e.remove());post(bx)}$("#bar").hidden=!!cur.blocked;$("#bk").hidden=!cur.blocked;
+  cur.blocked=d.blocked||"";cur.mm=!!d.muted?.[uid];cur.muted=!!d.muted?.[o.id];cur.seen=d.seen?.[o.id]?.toMillis?.()||0;{const bx=$("#msgs");bx.querySelectorAll(".sn").forEach(e=>e.remove());post(bx)}$("#bar").hidden=!!cur.blocked;$("#bk").hidden=!cur.blocked;
   $("#bk").textContent=cur.blocked===uid?_("You blocked this person. Unblock from the ⋯ menu."):_("You can't reply in this chat.");
   const t=d.typing?.[o.id]?.toMillis?.(),ty=$("#ty");clearTimeout(tm);
   if(t&&Date.now()-t<5000){ty.textContent=o.name+_(" is typing…");ty.hidden=false;tm=setTimeout(()=>ty.hidden=true,5000)}else ty.hidden=true});
@@ -350,6 +381,7 @@ async function open(c,o){
 function bubble(d){
  const m=d.data({serverTimestamps:"estimate"}),mine=m.from===uid,b=h("div","b"+(mine?" me":"")),cid=cur.id;let x=null;
  if(m.re)b.append(h("div","qt",m.re));
+ if(m.loc){const a=h("a","",_("📍 Open location"));a.href="https://www.openstreetmap.org/?mlat="+m.loc[0]+"&mlon="+m.loc[1]+"#map=16/"+m.loc[0]+"/"+m.loc[1];a.target="_blank";a.rel="noopener";a.onclick=e=>e.stopPropagation();a.style.cssText="color:inherit;font-weight:600;text-decoration:underline";b.append(a)}
  if(m.img){const i=h("img");i.onclick=e=>{e.stopPropagation();$("#vwi").src=i.src;$("#vw").hidden=false};b.append(i);photo(m.img,i,b,cid)}
  if(m.text){x=h("span","",m.text);x.dir="auto";b.append(x);
   if(!mine&&m.lang&&base(m.lang)!==base(me.lang)&&!emoOnly(m.text)){
@@ -380,28 +412,99 @@ async function translate(ref,m,x){
 async function photo(pid,img,b,cid){
  if(!(pid in P))try{P[pid]=(await getDoc(doc(db,"chats",cid,"photos",pid))).data()||null}catch{P[pid]=null}
  const p=P[pid];if(p&&p.expireAt.toMillis()>Date.now())img.src=p.data;else{img.remove();b.prepend(h("i","",_("Photo expired")))}}
-async function send(img){
- const text=$("#tx").value.trim();if(!cur||(!text&&!img))return;$("#tx").value="";$("#emo").classList.remove("on");
- const cid=cur.id,oid=cur.o.id;let pid=null;
+async function send(img,extra){
+ const text=$("#tx").value.trim();if(!cur||(!text&&!img&&!extra))return;$("#tx").value="";setSd();$("#emo").classList.remove("on");
+ const cid=cur.id,oid=cur.o.id,mu=cur.muted;let pid=null;
  try{if(img){pid=doc(collection(db,"chats",cid,"photos")).id;
    await setDoc(doc(db,"chats",cid,"photos",pid),{from:uid,data:img,expireAt:Timestamp.fromMillis(Date.now()+15*864e5)})}
-  await addDoc(collection(db,"chats",cid,"messages"),{from:uid,text,lang:me.lang,img:pid,t:serverTimestamp(),...(replyTo?{re:replyTo}:{})});
-  await updateDoc(doc(db,"chats",cid),{last:(pid?"📷 ":"")+text,updated:serverTimestamp(),lastFrom:uid});replyTo=null;$("#rp").hidden=true;
+  await addDoc(collection(db,"chats",cid,"messages"),{from:uid,text,lang:me.lang,img:pid,t:serverTimestamp(),...(replyTo?{re:replyTo}:{}),...(extra||{})});
+  await updateDoc(doc(db,"chats",cid),{last:(extra?.loc?"📍 ":pid?"📷 ":"")+text,updated:serverTimestamp(),lastFrom:uid,["unread."+oid]:increment(1)});replyTo=null;$("#rp").hidden=true;
   const o=(await getDoc(doc(db,"users",oid))).data();
-  if(o?.tokens?.length)fetch(CFG.worker+"/push",{method:"POST",headers:await hd(),body:JSON.stringify({tokens:o.tokens,name:me.name})}).catch(()=>{});
+  if(o?.tokens?.length&&!mu)fetch(CFG.worker+"/push",{method:"POST",headers:await hd(),body:JSON.stringify({tokens:o.tokens,name:me.name})}).catch(()=>{});
  }catch{$("#tx").value=text}}
-$("#sd").onclick=()=>send();$("#tx").onkeydown=e=>{if(e.key==="Enter")send()};
+$("#sd").onclick=()=>{if(!$("#tx").value.trim()&&SR)dictate();else send()};$("#tx").onkeydown=e=>{if(e.key==="Enter")send()};
 $("#ph").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(f)send(await shrink(f,1000,.7))};
 $("#eb").onclick=()=>$("#emo").classList.toggle("on");$("#back").onclick=()=>home();
 $("#tx").dir="auto";
 const bcp=l=>({NB:"nb-NO",ZH:"zh-CN"}[l]||l).replace(/^[A-Z]+/,x=>x.toLowerCase());
 const speak=t=>{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=bcp(me.lang);speechSynthesis.speak(u)};
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;$("#mic").hidden=!SR;
-$("#mic").onclick=()=>{const r=new SR();r.lang=bcp(me.lang);r.onresult=e=>{$("#tx").value+=($("#tx").value?" ":"")+e.results[0][0].transcript};r.onend=()=>$("#mic").style.opacity=1;$("#mic").style.opacity=.5;r.start()};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const dictate=()=>{const r=new SR();r.lang=bcp(me.lang);r.onresult=e=>{$("#tx").value+=($("#tx").value?" ":"")+e.results[0][0].transcript;setSd()};r.onend=()=>$("#sd").style.opacity=1;$("#sd").style.opacity=.5;r.start()};
 $("#tx").oninput=()=>{if(cur&&Date.now()-lastT>3000){lastT=Date.now();updateDoc(doc(db,"chats",cur.id),{["typing."+uid]:serverTimestamp()}).catch(()=>{})}};
 $("#rp").onclick=()=>{replyTo=null;$("#rp").hidden=true};
 $("#mn").onclick=()=>{$("#blk").textContent=cur.blocked===uid?_("Unblock"):_("Block");$("#blk").hidden=!!cur.blocked&&cur.blocked!==uid;$("#mnu").hidden=false};
 $("#mx").onclick=()=>$("#mnu").hidden=true;
 $("#blk").onclick=async()=>{await updateDoc(doc(db,"chats",cur.id),{blocked:cur.blocked===uid?deleteField():uid}).catch(()=>{});$("#mnu").hidden=true};
 $("#rm").onclick=async()=>{await updateDoc(doc(db,"chats",cur.id),{["hidden."+uid]:serverTimestamp()}).catch(()=>{});$("#mnu").hidden=true;home()};
+
+// ===== composer: mic turns into send once you type; attachment menu =====
+const svgi=n=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[n]+"</svg>";
+const setSd=()=>{const w=$("#tx").value.trim()||!SR?"send":"mic";if($("#sd").dataset.k!==w){$("#sd").dataset.k=w;$("#sd").innerHTML=svgi(w)}};
+$("#tx").addEventListener("input",setSd);setSd();
+$("#pl").onclick=()=>$("#att").hidden=false;
+$("#att").onclick=e=>{if(e.target.id==="att")$("#att").hidden=true};
+$("#a1").onclick=()=>{$("#att").hidden=true;$("#cam").click()};
+$("#a2").onclick=()=>{$("#att").hidden=true;$("#ph").click()};
+$("#cam").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(f)send(await shrink(f,1000,.7))};
+$("#a3").onclick=()=>{$("#att").hidden=true;if(!navigator.geolocation||!confirm(_("Share your current location with this chat?")))return;
+ navigator.geolocation.getCurrentPosition(p=>send(null,{loc:[+p.coords.latitude.toFixed(5),+p.coords.longitude.toFixed(5)]}),()=>{},{enableHighAccuracy:true,timeout:15000})};
+
+// ===== per-chat settings =====
+const PRC=(()=>{try{return JSON.parse(localStorage.lingoc||"{}")}catch{return{}}})();
+const savePRC=()=>{try{localStorage.lingoc=JSON.stringify(PRC)}catch{}};
+const WPS=["","linear-gradient(160deg,#fbd3e9,#bb377d33)","linear-gradient(160deg,#c2f0e6,#2bd4c033)","linear-gradient(160deg,#ffe9c7,#ff9a3c33)","linear-gradient(160deg,#cfd9ff,#3b5bfd33)","linear-gradient(160deg,#1b2440,#0b0f1c)"];
+const COLS=["","#7c3aed","#db2777","#e11d48","#ea580c","#059669","#0891b2"];
+function applyChat(cid){const a=PRC[cid]||{},c=$("#chat");a.c?c.style.setProperty("--me",a.c):c.style.removeProperty("--me");$("#msgs").style.background=a.w||""}
+const swatches=(box,list,key,paint)=>{list.forEach(v=>{const b=h("button");b.style.cssText="width:34px;height:34px;border-radius:50%;border:2px solid var(--glb);background:"+paint(v);b.onclick=()=>{(PRC[cur.id]=PRC[cur.id]||{})[key]=v;savePRC();applyChat(cur.id)};box.append(b)})};
+swatches($("#cs"),COLS,"c",v=>v||"#3b5bfd");swatches($("#ws"),WPS,"w",v=>v||"var(--bg)");
+const openInfo=()=>{const o=cur.o,ia=$("#ia"),t=h("h2","",o.name);t.style.margin="8px 0 0";ia.replaceChildren(av(o),t,h("small","mu",L.find(l=>l[0]===o.lang)?.[1]||""));ia.style.textAlign="center";
+ $("#mute").checked=!!cur.mm;$("#gal").replaceChildren();$("#blk").textContent=cur.blocked===uid?_("Unblock"):_("Block");$("#blk").hidden=!!cur.blocked&&cur.blocked!==uid;$("#mnu").hidden=false};
+$("#mn").onclick=openInfo;["#cn","#cl","#cav"].forEach(x=>$(x).onclick=openInfo);
+$("#mnu").onclick=e=>{if(e.target===$("#mnu"))$("#mnu").hidden=true};
+$("#mute").onchange=()=>updateDoc(doc(db,"chats",cur.id),{["muted."+uid]:$("#mute").checked}).catch(()=>{});
+$("#shp").onclick=async()=>{const g=$("#gal");g.replaceChildren(h("small","mu",_("Loading…")));
+ try{const s=await getDocs(query(collection(db,"chats",cur.id,"photos"),orderBy("expireAt","desc"),limit(24)));g.replaceChildren();
+  s.forEach(d=>{const p=d.data();if(p.expireAt.toMillis()<Date.now())return;const i=h("img");i.src=p.data;i.onclick=()=>{$("#vwi").src=i.src;$("#vw").hidden=false};g.append(i)});
+  if(!g.children.length)g.append(h("small","mu",_("No photos yet")))}catch{g.replaceChildren()}};
+
+// ===== first-run intro =====
+let si=0;
+const slides=()=>[_("Write in your language. Your friend reads it in theirs."),_("Tap a message to reply, react or listen. Swipe right to reply."),_("Install Lingo: on iPhone tap Share, then Add to Home Screen. On Android tap Install.")];
+const drawIntro=()=>{const s=slides();$("#it").textContent=s[si];$("#iw").replaceChildren(...s.map((x,i)=>h("span","dotp"+(i===si?" f":""))));$("#in").textContent=_(si<2?"Next":"Done")};
+const showIntro=()=>{si=0;drawIntro();$("#intro").hidden=false};
+$("#in").onclick=()=>{if(si<2){si++;drawIntro()}else{$("#intro").hidden=true;PR.intro=1;savePR()}};
+
+// ===== app lock: PIN + optional fingerprint (device's own biometric) =====
+const LS=k=>{try{return localStorage[k]}catch{return null}},SS=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage[k]=v}catch{}};
+const hashPin=async(p,s)=>btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s+p)))));
+const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))),unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let lmode="unlock",lpin="",lfirst="",unlocked=false,lastHide=0;
+const drawDots=()=>$("#ld").replaceChildren(...[0,1,2,3].map(i=>h("span","dotp"+(i<lpin.length?" f":""))));
+function lock(title,err){$("#lock").hidden=false;if(title)$("#lt").textContent=title;$("#le").textContent=err||"";lpin="";drawDots();
+ $("#lf").hidden=!(lmode==="unlock"&&LS("lcred"));$("#lo").hidden=lmode!=="unlock";$("#lc").hidden=lmode==="unlock"}
+async function pinKey(k){
+ if(k==="⌫")lpin=lpin.slice(0,-1);else if(lpin.length<4)lpin+=k;
+ drawDots();if(lpin.length<4)return;
+ const pin=lpin;lpin="";
+ if(lmode==="set1"){lfirst=pin;lmode="set2";lock(_("Confirm your PIN"));return}
+ if(lmode==="set2"){if(pin!==lfirst){lmode="set1";lock(_("Create a 4-digit PIN"),_("PINs don't match. Try again."));return}
+  const s=Array.from(crypto.getRandomValues(new Uint8Array(8))).join("");SS("lsalt",s);SS("lhash",await hashPin(pin,s));PR.lock=1;savePR();unlocked=true;$("#lock").hidden=true;lockUI();return}
+ if(Date.now()<+(LS("lt")||0)){lock(null,_("Too many tries. Try again later."));return}
+ if(await hashPin(pin,LS("lsalt")||"")===LS("lhash")){SS("lf",null);
+  if(lmode==="off"){["lhash","lsalt","lcred"].forEach(k=>SS(k,null));PR.lock=0;savePR();lockUI()}
+  unlocked=true;$("#lock").hidden=true}
+ else{const f=+(LS("lf")||0)+1;SS("lf",String(f));if(f>=5)SS("lt",String(Date.now()+30000*Math.pow(2,f-5)));lock(null,_("Wrong PIN"))}
+}
+const kp=$("#kp");["1","2","3","4","5","6","7","8","9","","0","⌫"].forEach(k=>{const b=h("button","",k);if(!k)b.style.visibility="hidden";b.onclick=()=>pinKey(k);kp.append(b)});
+function lockCheck(){if(PR.lock&&LS("lhash")&&!unlocked){lmode="unlock";lock(_("Enter PIN"));if(LS("lcred"))bio()}}
+async function bio(){try{await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:"public-key",id:unb64(LS("lcred"))}],userVerification:"required",timeout:60000}});unlocked=true;$("#lock").hidden=true}catch{}}
+$("#lf").onclick=bio;
+$("#lo").onclick=()=>{["lhash","lsalt","lcred"].forEach(k=>SS(k,null));PR.lock=0;savePR();$("#lock").hidden=true;unlocked=false;signOut(auth)};
+$("#lc").onclick=()=>$("#lock").hidden=true;
+document.addEventListener("visibilitychange",()=>{if(document.hidden)lastHide=Date.now();else if(PR.lock&&Date.now()-lastHide>30000){unlocked=false;lockCheck()}});
+const bioOK=async()=>{try{return!!(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch{return false}};
+async function lockUI(){const on=!!(PR.lock&&LS("lhash"));$("#lk").hidden=!editing;$("#lk").textContent=_(on?"Turn off app lock":"Set up app lock");$("#fpl").hidden=!editing||!on||!(await bioOK());$("#fpid").checked=!!LS("lcred")}
+$("#lk").onclick=()=>{if(PR.lock&&LS("lhash")){lmode="off";lock(_("Enter PIN"))}else{lmode="set1";lock(_("Create a 4-digit PIN"))}};
+$("#fpid").onchange=async()=>{if(!$("#fpid").checked){SS("lcred",null);return}
+ try{const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:"Lingo"},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:me.username||"lingo",displayName:me.name||"Lingo"},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000}});SS("lcred",b64u(c.rawId))}catch{$("#fpid").checked=false}};
 </script></body></html>
