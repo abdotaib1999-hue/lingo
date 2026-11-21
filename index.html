@@ -100,6 +100,11 @@ header{position:relative;z-index:6;margin:calc(env(safe-area-inset-top) + 8px) 1
 @media(min-width:900px) and (prefers-color-scheme:dark){body.split{background:radial-gradient(60% 50% at 15% 10%,color-mix(in srgb,var(--ac) 28%,transparent),transparent 70%),radial-gradient(50% 50% at 90% 90%,rgba(255,120,190,.16),transparent 70%),#07090d}}
 @media(prefers-reduced-transparency:reduce){:root{--gl:var(--sf);--gl2:var(--sf)}*{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:root{--gl:var(--sf);--gl2:var(--sf)}}
+.ib{position:relative}
+.ib svg{position:absolute;top:50%;left:50%;width:20px;height:20px;margin:-10px 0 0 -10px}
+.rp .ib{width:32px;height:32px;flex:none}.rp .ib svg{width:16px;height:16px;margin:-8px 0 0 -8px}
+#sd{background:linear-gradient(165deg,color-mix(in srgb,var(--me) 84%,#fff),var(--me))!important;color:#fff}
+.rx{cursor:pointer}
 </style></head><body><div class="app">
 
 <section id="auth"><div class="pad" style="margin:auto 0">
@@ -131,7 +136,7 @@ header{position:relative;z-index:6;margin:calc(env(safe-area-inset-top) + 8px) 1
 <div style="padding:12px 16px calc(12px + env(safe-area-inset-bottom))"><div style="display:flex;gap:8px"><button class="btn alt" id="inv">Copy invite link</button><button class="btn alt" id="qb" style="width:auto">QR code</button></div></div></section>
 
 <section id="chat"><header><button class="ib" id="back" title="Back" data-i="left"></button><span id="cav"></span><div style="flex:1;min-width:0"><h2 id="cn"></h2><small class="mu" id="cl"></small></div><button class="ib" id="mn" title="More" data-i="more"></button></header>
-<div class="msgs" id="msgs"></div><p class="mu" id="ty" hidden style="padding:0 16px 6px"></p><p class="note" id="pz" hidden>Translation is paused (monthly limit reached). Showing original messages.</p><p class="note" id="tip" hidden style="cursor:pointer">Tip: short, clear sentences translate best. Tap a message for Reply, React and Listen. (Tap here to dismiss)</p><div class="emo" id="emo"></div><div class="rp" id="rp" hidden><span id="rpt"></span><button id="rpx" title="Cancel reply" data-i="x"></button></div><p class="note" id="bk" hidden></p>
+<div class="msgs" id="msgs"></div><p class="mu" id="ty" hidden style="padding:0 16px 6px"></p><p class="note" id="pz" hidden>Translation is paused (monthly limit reached). Showing original messages.</p><p class="note" id="tip" hidden style="cursor:pointer">Tip: short, clear sentences translate best. Tap a message for Reply, React and Listen. (Tap here to dismiss)</p><div class="emo" id="emo"></div><div class="rp" id="rp" hidden><span id="rpt"></span><button class="ib" id="rpx" title="Cancel reply" data-i="x"></button></div><p class="note" id="bk" hidden></p>
 <div class="bar" id="bar"><label class="ib" title="Send a photo"><span data-i="image"></span><input id="ph" type="file" accept="image/*" hidden></label><button class="ib" id="eb" title="Emoji" data-i="smile"></button><button class="ib" id="mic" title="Dictate" data-i="mic"></button>
 <input id="tx" placeholder="Message" autocomplete="off"><button class="ib" id="sd" style="background:var(--ac);color:#fff" title="Send" data-i="send"></button></div></section>
 <div id="empty"><img src="icon.svg" alt="" width="88" height="88" style="border-radius:22px"><p class="mu">Select a chat to start talking</p></div>
@@ -209,7 +214,8 @@ const T=[
 ["Today","Hoje","Aujourd’hui","Heute"],["Yesterday","Ontem","Hier","Gestern"],
 ["Unblock","Desbloquear","Débloquer","Entblocken"],["Block","Bloquear","Bloquer","Blockieren"],
 ["Search chats or add by @username"],["Appearance"],["Small"],["Normal"],["Large"],["Show original under translations"],["Seen"],["React"],
-["Tip: short, clear sentences translate best. Tap a message for Reply, React and Listen. (Tap here to dismiss)"]
+["Tip: short, clear sentences translate best. Tap a message for Reply, React and Listen. (Tap here to dismiss)"],
+["Remove"],["Tap to remove your reaction"]
 ];
 const DICT={PT:{},FR:{},DE:{}};T.forEach(r=>{DICT.PT[r[0]]=r[1];DICT.FR[r[0]]=r[2];DICT.DE[r[0]]=r[3]});
 let UIL="EN";const _=s=>DICT[UIL]?.[s]||s,EN=new Set(T.map(r=>r[0])),reg=[];
@@ -349,18 +355,21 @@ function bubble(d){
   if(!mine&&m.lang&&base(m.lang)!==base(me.lang)&&!emoOnly(m.text)){
    const t=m.tr?.[key(me.lang)];
    if(t){if(!(m.src&&base(m.src)===base(me.lang))){
-     const nm=m.src?_(" from ")+(L.find(l=>base(l[0])===m.src)?.[1]||m.src).replace(/ \(.*\)/,""):"",lbl=_("Translated")+nm+_(" · tap for original"),n=h("i","",lbl);
+     const nm=(L.find(l=>base(l[0])===m.src)||[])[1]?_(" from ")+L.find(l=>base(l[0])===m.src)[1].replace(/ \(.*\)/,""):"",lbl=_("Translated")+nm+_(" · tap for original"),n=h("i","",lbl);
      x.textContent=t;if(PR.both){const o=h("div","orig",m.text);o.dir="auto";b.append(o)}b.append(n);
      n.onclick=e=>{e.stopPropagation();const o=n.dataset.o;n.dataset.o=o?"":"1";x.textContent=o?t:m.text;n.textContent=o?lbl:_("Original · tap for translation")}}}
    else if(!paused){x.textContent=_("Translating…");x.style.opacity=.6;translate(d.ref,m,x)}}}
- const rxs=Object.values(m.rx||{});if(rxs.length)b.append(h("div","rx",rxs.join(" ")));
+ const rxs=Object.values(m.rx||{});if(rxs.length){const rc=h("div","rx",rxs.join(" "));if(m.rx?.[uid]){rc.title=_("Tap to remove your reaction");rc.onclick=ev=>{ev.stopPropagation();updateDoc(d.ref,{["rx."+uid]:deleteField()}).catch(()=>{})}}b.append(rc)}
  const tmx=m.t?.toMillis?.();b.dataset.f=m.from;if(tmx){b.dataset.t=tmx;b.append(h("small","tm",hm(tmx)))}
  const act=h("div","act");act.hidden=true;
  const add=(s,f)=>{const a=h("i","",s);a.onclick=e=>{e.stopPropagation();f()};act.append(a)};
  const rep=()=>{replyTo=(m.text||_("📷 Photo")).slice(0,100);$("#rpt").textContent=replyTo;$("#rp").hidden=false;$("#tx").focus()};add(_("Reply"),rep);
- let sx=0;b.addEventListener("touchstart",e=>{sx=e.touches[0].clientX},{passive:true});b.addEventListener("touchend",e=>{if(e.changedTouches[0].clientX-sx>70)rep()},{passive:true});
+ let sx=0,sy=0;b.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});b.addEventListener("touchend",e=>{const t=e.changedTouches[0];if(t.clientX-sx>90&&Math.abs(t.clientY-sy)<30)rep()},{passive:true});
  if(x&&!mine)add(_("Listen"),()=>speak(x.textContent));
- add(_("React"),()=>{const rp=h("div","act");["👍","❤️","😂","😮","😢","🙏"].forEach(em=>{const bt=h("i","",em);bt.style.fontSize="22px";bt.onclick=ev=>{ev.stopPropagation();updateDoc(d.ref,{["rx."+uid]:m.rx?.[uid]===em?deleteField():em}).catch(()=>{})};rp.append(bt)});act.replaceChildren(rp)});
+ add(_("React"),()=>{const keep=[...act.childNodes],rp=h("div","act"),mine=m.rx?.[uid];
+  ["👍","❤️","😂","😮","😢","🙏"].forEach(em=>{const bt=h("i","",em);bt.style.cssText="font-size:22px;"+(mine===em?"outline:2px solid currentColor;border-radius:8px":"");bt.onclick=ev=>{ev.stopPropagation();updateDoc(d.ref,{["rx."+uid]:mine===em?deleteField():em}).catch(()=>{})};rp.append(bt)});
+  if(mine){const rm=h("i","",_("Remove"));rm.onclick=ev=>{ev.stopPropagation();updateDoc(d.ref,{["rx."+uid]:deleteField()}).catch(()=>{})};rp.append(rm)}
+  const bk=h("i","","✕");bk.onclick=ev=>{ev.stopPropagation();act.replaceChildren(...keep)};rp.append(bk);act.replaceChildren(rp)});
  if(mine)add(_("Delete"),()=>{deleteDoc(d.ref);if(m.img)deleteDoc(doc(db,"chats",cid,"photos",m.img))});
  b.append(act);b.onclick=()=>act.hidden=!act.hidden;
  return b}
@@ -390,7 +399,7 @@ const speak=t=>{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t)
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;$("#mic").hidden=!SR;
 $("#mic").onclick=()=>{const r=new SR();r.lang=bcp(me.lang);r.onresult=e=>{$("#tx").value+=($("#tx").value?" ":"")+e.results[0][0].transcript};r.onend=()=>$("#mic").style.opacity=1;$("#mic").style.opacity=.5;r.start()};
 $("#tx").oninput=()=>{if(cur&&Date.now()-lastT>3000){lastT=Date.now();updateDoc(doc(db,"chats",cur.id),{["typing."+uid]:serverTimestamp()}).catch(()=>{})}};
-$("#rpx").onclick=()=>{replyTo=null;$("#rp").hidden=true};
+$("#rp").onclick=()=>{replyTo=null;$("#rp").hidden=true};
 $("#mn").onclick=()=>{$("#blk").textContent=cur.blocked===uid?_("Unblock"):_("Block");$("#blk").hidden=!!cur.blocked&&cur.blocked!==uid;$("#mnu").hidden=false};
 $("#mx").onclick=()=>$("#mnu").hidden=true;
 $("#blk").onclick=async()=>{await updateDoc(doc(db,"chats",cur.id),{blocked:cur.blocked===uid?deleteField():uid}).catch(()=>{});$("#mnu").hidden=true};
