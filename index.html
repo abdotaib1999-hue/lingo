@@ -40,7 +40,7 @@ input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
 .mu{color:var(--mu);font-size:14px}.err{color:#d92d20;font-size:14px;min-height:18px}
 .sheet{position:fixed;inset:0;background:#0009;display:grid;place-items:center;z-index:9}
 .card{background:var(--sf);border-radius:24px;padding:24px;text-align:center;max-width:320px;width:86%}
-.card svg{width:100%;height:auto;border-radius:12px;background:#fff;padding:10px}
+#qr .card svg{width:100%;height:auto;border-radius:12px;background:#fff;padding:10px}
 .more{align-self:center;flex:none;background:var(--ac2);color:var(--ac);padding:6px 14px;border-radius:99px;font-size:14px}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--ac);margin-left:auto;flex:none}
 .act{display:flex;gap:16px;margin-top:4px}.act i{font-weight:600;opacity:.9}
@@ -126,7 +126,7 @@ header{position:relative;z-index:6;margin:calc(env(safe-area-inset-top) + 8px) 1
 body{font-family:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif}
 #home{position:relative}
 #home header{background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;padding:12px 4px 0}
-#home h1{font-size:30px;letter-spacing:-1px}.dot{color:#49AAFF}
+#home h1{font-size:30px;letter-spacing:-1px}.wd{color:#49AAFF}
 .hero{margin:12px 16px 0;padding:16px;border-radius:28px;background:linear-gradient(160deg,#2F78DB,#1E4FB8);color:#fff;box-shadow:0 14px 30px rgba(30,79,184,.3)}
 .ht{font-weight:700;font-size:16px;margin-bottom:10px}
 .frs{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px}
@@ -163,6 +163,24 @@ body{font-family:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif}
 .em{width:48px;height:48px;border-radius:50%;border:0;background:var(--ac2);font-size:24px;line-height:48px;padding:0}.em.on{outline:2px solid var(--ac)}
 .ac{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:52px;padding:0;border:0;border-bottom:1px solid var(--ln);background:none;font-size:16px;color:var(--ink);text-align:start}.ac:last-child{border-bottom:0}.ac.red{color:#C62828}.ac svg{width:20px;height:20px}
 #ms{z-index:12;place-items:end center}
+/* ===== round 3 ===== */
+.sheet .card{background:var(--sf)}
+input[type=checkbox]{-webkit-appearance:none;appearance:none;width:50px!important;min-width:50px;height:30px;padding:0;border:0!important;border-radius:15px;background:#C9CED6!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;position:relative;flex:none;cursor:pointer;transition:background .2s}
+input[type=checkbox]::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.25);transition:transform .2s}
+input[type=checkbox]:checked{background:var(--ac)!important}input[type=checkbox]:checked::after{transform:translateX(20px)}
+html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] input[type=checkbox]:checked::after{transform:translateX(-20px)}
+.fn{max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fl{opacity:.85;font-size:11px;margin-top:-2px}
+.b{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.b.big{background:none!important;box-shadow:none!important;padding:0 4px}.ae{display:inline-block;vertical-align:middle}
+.burst{position:fixed;left:50%;top:45%;width:140px;height:140px;margin:-70px 0 0 -70px;z-index:70;pointer-events:none;animation:bp .95s ease-out forwards}
+.burst img,.burst span{width:140px;height:140px}
+@keyframes bp{0%{transform:scale(.3);opacity:0}30%{transform:scale(1.15);opacity:1}100%{transform:scale(1) translateY(-70px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.burst{animation:none;display:none}}
+.em{display:grid;place-items:center}
+#hub{display:flex;flex-direction:column;gap:10px}#hub[hidden],.sec[hidden]{display:none}.sec{display:flex;flex-direction:column;gap:12px}
+.hb{display:flex;align-items:center;gap:14px;width:100%;min-height:56px;padding:0 16px;border-radius:18px;border:1px solid var(--glb);background:var(--sf);color:var(--ink);font-size:16px;font-weight:600;text-align:start}
+.hb span{flex:1}.hb i{display:block;width:20px;height:20px;color:var(--ac)}.hb i:last-child{color:var(--mu)}.hb svg{width:20px;height:20px;display:block}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#101010;color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;z-index:60}
 </style></head><body><div class="app">
 
 <section id="auth"><div class="pad" style="margin:auto 0">
@@ -174,33 +192,65 @@ body{font-family:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif}
 <button class="btn alt" id="si">Sign in</button><button class="btn alt" id="su">Create account</button><button id="fp" style="color:var(--ac);padding:6px;font-size:14px">Forgot password?</button>
 <p class="err" id="ae"></p></div></section>
 
-<section id="setup"><header><h2 id="st"></h2></header><div class="pad">
+<section id="setup"><header><button class="ib" id="pb" title="Back" data-i="left" hidden></button><h2 id="st" style="flex:1"></h2></header>
+<div class="pad">
+<div id="hub" hidden>
+<button class="hb" data-s="name"><i data-i="user"></i><span>Name and photo</span><i data-i="chev"></i></button>
+<button class="hb" data-s="lang"><i data-i="globe"></i><span>Language</span><i data-i="chev"></i></button>
+<button class="hb" data-s="look"><i data-i="sliders"></i><span>Appearance</span><i data-i="chev"></i></button>
+<button class="hb" data-s="notif"><i data-i="bell"></i><span>Notifications</span><i data-i="chev"></i></button>
+<button class="hb" data-s="lock"><i data-i="lock"></i><span>App lock</span><i data-i="chev"></i></button>
+<button class="hb" data-s="invite"><i data-i="share"></i><span>Invite friends</span><i data-i="chev"></i></button>
+<button class="hb" data-s="about"><i data-i="info"></i><span>About</span><i data-i="chev"></i></button>
+<button class="btn alt" id="so" style="margin-top:8px">Sign out</button>
+</div>
+<div class="sec" data-s="name" hidden>
+<p class="mu">Your photo and name are shown to your friends.</p>
 <label class="av pv" id="pv"><span id="pt">+</span><input id="pf" type="file" accept="image/*" hidden></label>
 <input id="nm" placeholder="Your name" maxlength="30">
 <input id="usr" placeholder="Username (letters, numbers, _)" maxlength="20" autocapitalize="none">
+<button class="btn" id="sv1">Save</button>
+</div>
+<div class="sec" data-s="lang" hidden>
+<p class="mu">Choose the language you read and write in.</p>
 <select id="lg"></select>
-<div id="invw" style="display:flex;gap:8px" hidden><button class="btn alt" id="inv">Copy invite link</button><button class="btn alt" id="qb" style="width:auto">QR code</button></div>
-<p class="mu" style="margin-top:6px">Appearance</p>
+<button class="btn" id="sv2">Save</button>
+</div>
+<div class="sec" data-s="look" hidden>
+<p class="mu">Changes here apply right away.</p>
 <div id="sw" style="display:flex;gap:10px;flex-wrap:wrap"></div>
 <select id="ts"><option value="15">Small</option><option value="16">Normal</option><option value="18">Large</option></select>
-<label class="mu" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="both" style="width:auto"><span>Show original under translations</span></label>
-<p class="mu" style="margin-top:6px">App lock</p>
+<label class="tg"><span>Show original under translations</span><input type="checkbox" id="both"></label>
+</div>
+<div class="sec" data-s="notif" hidden>
+<p class="mu" id="nt"></p>
+<button class="btn alt" id="nb">Turn on notifications</button>
+</div>
+<div class="sec" data-s="lock" hidden>
 <button class="btn alt" id="lk">Set up app lock</button>
-<label class="mu" id="fpl" style="display:flex;gap:8px;align-items:center" hidden><input type="checkbox" id="fpid" style="width:auto"><span>Unlock with fingerprint</span></label>
-<button class="btn" id="sv">Save</button>
-<button class="btn alt" id="cx">Cancel</button><button class="btn alt" id="so">Sign out</button>
+<label class="tg" id="fpl" hidden><span>Unlock with fingerprint</span><input type="checkbox" id="fpid"></label>
+</div>
+<div class="sec" data-s="invite" hidden>
+<div id="invw" style="display:flex;gap:8px" hidden><button class="btn alt" id="inv">Copy invite link</button><button class="btn alt" id="qb" style="width:auto">QR code</button></div>
+</div>
+<div class="sec" data-s="about" hidden>
+<p class="mu">Lingo lets friends chat in their own languages.</p>
+<p class="mu">Animated emoji: Google Noto Emoji Animation (CC BY 4.0).</p>
+</div>
+<button class="btn" id="sv" hidden>Save</button>
 <p class="err" id="se"></p></div></section>
 
-<section id="home"><header><h1>Lingo<span class="dot">.</span></h1><button class="ib" id="ng" title="New group" data-i="users"></button><button class="ib" id="bell" title="Turn on notifications" data-i="bell"></button><button class="ib" id="mb" title="Profile" data-i="user" hidden></button></header>
+<section id="home"><header><h1>Lingo<span class="wd">.</span></h1><button class="ib" id="ng" title="New group" data-i="users" hidden></button><button class="ib" id="bell" title="Turn on notifications" data-i="bell"></button><button class="ib" id="mb" title="Profile" data-i="user" hidden></button></header>
 <div class="hero"><div class="ht">Friends and languages</div><div class="frs" id="frs"></div>
 <div class="sb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="un" placeholder="Search chats or add by @username" autocapitalize="none"><button class="ib" id="add" title="Send request" data-i="plus"></button></div>
 <p class="err" id="he"></p></div>
 <div class="chips" id="chips"><button class="ch on" data-f="all">All</button><button class="ch" data-f="unread">Unread <b class="cn" id="c1"></b></button><button class="ch" data-f="groups">Groups <b class="cn" id="c2"></b></button><button class="ch" data-f="muted">Muted</button></div>
+<div id="gbar" hidden style="padding:6px 16px 0"><button class="btn" id="ngb">New group</button></div><p class="mu" id="gempty" hidden style="padding:8px 20px">No groups yet. Tap New group to create one.</p>
 <div id="invs"></div><div class="list" id="list"></div>
 <nav class="tabs"><button id="t1" class="on"><i data-i="msg"></i><span>Chats</span></button><button id="t2" aria-label="Groups"><i data-i="users"></i><span>Groups</span></button><button id="t3" aria-label="Profile"><i data-i="user"></i><span>Profile</span></button></nav></section>
 
 <section id="chat"><header><button class="ib" id="back" title="Back" data-i="left"></button><span id="cav"></span><div style="flex:1;min-width:0"><h2 id="cn"></h2><small class="mu" id="cl"></small></div><button class="ib" id="mn" title="More" data-i="info"></button></header>
-<div class="msgs" id="msgs"></div><p class="mu" id="ty" hidden style="padding:0 16px 6px"></p><p class="note" id="pz" hidden>Translation is paused (monthly limit reached). Showing original messages.</p><p class="note" id="tip" hidden style="cursor:pointer">Tip: short, clear sentences translate best. Tap a message for Reply, React and Listen. (Tap here to dismiss)</p><div class="emo" id="emo"></div><div class="rp" id="rp" hidden><span id="rpt"></span><button class="ib" id="rpx" title="Cancel reply" data-i="x"></button></div><p class="note" id="bk" hidden></p>
+<div class="msgs" id="msgs"></div><p class="mu" id="ty" hidden style="padding:0 16px 6px"></p><p class="note" id="pz" hidden>Translation is paused (monthly limit reached). Showing original messages.</p><p class="note" id="tip" hidden style="cursor:pointer">Tip: short, clear sentences translate best. Hold a message for Reply, React and Listen. (Tap here to dismiss)</p><div class="emo" id="emo"></div><div class="rp" id="rp" hidden><span id="rpt"></span><button class="ib" id="rpx" title="Cancel reply" data-i="x"></button></div><p class="note" id="bk" hidden></p>
 <div class="bar" id="bar"><button class="ib" id="pl" title="Attach" data-i="plus"></button><input id="tx" placeholder="Message" autocomplete="off"><button class="ib" id="eb" title="Emoji" data-i="smile"></button><button class="ib" id="sd" style="background:var(--ac);color:#fff" title="Send" data-i="mic"></button></div></section>
 <div id="empty"><img src="icon.svg" alt="" width="88" height="88" style="border-radius:22px"><p class="mu">Select a chat to start talking</p></div>
 </div>
@@ -223,6 +273,7 @@ body{font-family:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif}
 <div class="sheet" id="lock" hidden style="background:var(--bg);z-index:99"><div class="card" style="background:transparent;box-shadow:none;border:0;-webkit-backdrop-filter:none;backdrop-filter:none"><img src="icon.svg" alt="" width="64" height="64" style="border-radius:16px"><p id="lt" style="font-size:18px;font-weight:600;margin:12px 0 6px"></p><div id="ld" class="swr" style="justify-content:center;margin-bottom:6px"></div><p class="err" id="le"></p><div id="kp" class="kp"></div><button class="btn alt" id="lf" hidden>Use fingerprint</button><button id="lo" class="mu" style="padding:10px" hidden>Forgot PIN? Sign out</button><button id="lc" class="mu" style="padding:10px" hidden>Cancel</button></div></div>
 <div class="sheet" id="grp" hidden><div class="card" style="text-align:start;max-height:88vh;overflow:auto"><h2 id="gt" style="margin-bottom:10px">New group</h2><input id="gn" placeholder="Group name" maxlength="40"><div id="gl" style="margin:10px 0"></div><p class="err" id="ge"></p><button class="btn" id="gc">Create group</button><button class="btn alt" id="gx">Cancel</button></div></div>
 <div class="sheet" id="ms" hidden><div class="msheet"><div class="grab"></div><div class="mq" id="mq"></div><div class="rl">React</div><div class="remo" id="mr"></div><div id="ml"></div></div></div>
+<div class="toast" id="toast" hidden></div>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script type="module">
 // ---- 1. Fill in your own values (see Firebase console + Cloudflare) ----
@@ -247,6 +298,7 @@ L.forEach(([v,n])=>$("#lg").append(new Option(n,v)));
 const IC={bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',left:'<path d="m15 18-6-6 6-6"/>',more:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',image:'<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/>',mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'};
 IC.camera='<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>';IC.pin='<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>';IC.users='<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>';
 IC.msg='<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>';IC.info='<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>';IC.reply='<path d="m9 17-5-5 5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>';IC.vol='<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>';IC.copy='<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>';IC.trash='<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>';IC.check2='<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>';
+IC.globe='<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>';IC.sliders='<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/>';IC.lock='<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>';IC.share='<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>';IC.chev='<path d="m9 18 6-6-6-6"/>';
 document.querySelectorAll("[data-i]").forEach(e=>e.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[e.dataset.i]+"</svg>");
 const T=[
 ["Chat with friends in your own language. Every message is translated for you.","Converse com amigos no seu idioma. Cada mensagem é traduzida para você.","Discutez avec vos amis dans votre langue. Chaque message est traduit pour vous.","Chatte mit Freunden in deiner Sprache. Jede Nachricht wird für dich übersetzt."],
@@ -294,16 +346,17 @@ const T=[
 ["Today","Hoje","Aujourd’hui","Heute"],["Yesterday","Ontem","Hier","Gestern"],
 ["Unblock","Desbloquear","Débloquer","Entblocken"],["Block","Bloquear","Bloquer","Blockieren"],
 ["Search chats or add by @username"],["Appearance"],["Small"],["Normal"],["Large"],["Show original under translations"],["Seen"],["React"],
-["Tip: short, clear sentences translate best. Tap a message for Reply, React and Listen. (Tap here to dismiss)"],
+["Tip: short, clear sentences translate best. Hold a message for Reply, React and Listen. (Tap here to dismiss)"],
 ["Remove"],["Tap to remove your reaction"],
 ["Attach"],["Camera"],["Gallery"],["My Location"],["Share your current location with this chat?"],["📍 Open location"],
 ["Mute notifications"],["Chat color"],["Wallpaper"],["Shared photos"],["Loading…"],["No photos yet"],
-["Write in your language. Your friend reads it in theirs."],["Tap a message to reply, react or listen. Swipe right to reply."],
+["Write in your language. Your friend reads it in theirs."],["Hold a message to reply, react or listen. Swipe right to reply."],
 ["Install Lingo: on iPhone tap Share, then Add to Home Screen. On Android tap Install."],["Next"],["Done"],
 ["App lock"],["Set up app lock"],["Turn off app lock"],["Unlock with fingerprint"],["Use fingerprint"],["Forgot PIN? Sign out"],
 ["Enter PIN"],["Create a 4-digit PIN"],["Confirm your PIN"],["PINs don't match. Try again."],["Wrong PIN"],["Too many tries. Try again later."],
 ["New group"],["Group name"],["Create group"],["Send invites"],["Add members"],["Rename group"],["Leave group"],["New group name"],["Group invitation"],["Invited by"],["Decline"],["members"],["Admin"],["Select friends to invite"],["No friends to add yet."],["Enter a group name."],["Could not create the group."],
-["Friends and languages"],["All"],["Unread"],["Muted"],["Pinned"],["All chats"],["Groups"],["Add"],["Pin chat"],["Copy"]
+["Friends and languages"],["All"],["Unread"],["Muted"],["Pinned"],["All chats"],["Groups"],["Add"],["Pin chat"],["Copy"],
+["Name and photo"],["Language"],["Notifications"],["Invite friends"],["About"],["Your photo and name are shown to your friends."],["Choose the language you read and write in."],["Changes here apply right away."],["Notifications are on."],["Notifications are off on this device."],["Lingo lets friends chat in their own languages."],["Animated emoji: Google Noto Emoji Animation (CC BY 4.0)."],["Saved"],["No groups yet. Tap New group to create one."]
 ];
 const DICT={PT:{},FR:{},DE:{}};T.forEach(r=>{DICT.PT[r[0]]=r[1];DICT.FR[r[0]]=r[2];DICT.DE[r[0]]=r[3]});
 let UIL="EN";const _=s=>DICT[UIL]?.[s]||s,EN=new Set(T.map(r=>r[0])),reg=[];
@@ -362,10 +415,12 @@ onAuthStateChanged(auth,async u=>{
 
 // ---- Profile ----
 const setPv=d=>{$("#pv").style.background=d?`url(${d}) center/cover`:"";$("#pt").textContent=d?"":"+"};
-function openSetup(edit,d){editing=edit;photoData=d.photo||"";$("#nm").value=d.name||"";$("#usr").value=d.username||"";$("#usr").disabled=edit;$("#lg").value=d.lang||"EN-US";setPv(photoData);
- $("#cx").hidden=$("#so").hidden=!edit;$("#st").textContent=edit?_("Edit profile"):_("Set up your profile");$("#se").textContent="";show("setup");lockUI()}
+function openSetup(edit,d){editing=edit;photoData=d.photo||"";$("#nm").value=d.name||"";$("#usr").value=d.username||"";$("#usr").disabled=edit;$("#lg").value=d.lang||"EN-US";setPv(photoData);$("#se").textContent="";
+ $("#pb").hidden=!edit;$("#sv").hidden=edit;
+ if(edit)profView("");else{$("#hub").hidden=true;document.querySelectorAll("#setup .sec").forEach(e=>e.hidden=!["name","lang"].includes(e.dataset.s));$("#sv1").hidden=$("#sv2").hidden=true;$("#st").textContent=_("Set up your profile")}
+ show("setup");lockUI()}
 $("#pf").onchange=async e=>{const f=e.target.files[0];if(f){photoData=await shrink(f,128,.8);setPv(photoData)}};
-$("#cx").onclick=()=>home();$("#lg").onchange=()=>{setUI($("#lg").value);fetchUI($("#lg").value);$("#st").textContent=_(editing?"Edit profile":"Set up your profile")};$("#mb").onclick=()=>openSetup(true,me);
+$("#lg").onchange=()=>{setUI($("#lg").value);fetchUI($("#lg").value);if(!editing)$("#st").textContent=_("Set up your profile")};$("#mb").onclick=()=>openSetup(true,me);
 $("#sv").onclick=async()=>{
  const name=$("#nm").value.trim(),un=$("#usr").value.trim().toLowerCase(),lang=$("#lg").value,e=$("#se");
  if(!name)return e.textContent=_("Enter your name.");
@@ -373,7 +428,7 @@ $("#sv").onclick=async()=>{
  try{const b=writeBatch(db);
   if(editing)b.update(doc(db,"users",uid),{name,lang,photo:photoData});
   else{b.set(doc(db,"usernames",un),{uid});b.set(doc(db,"users",uid),{name,username:un,lang,photo:photoData,tokens:[]})}
-  await b.commit();me={tokens:[],...me,name,lang,photo:photoData,username:editing?me.username:un};delete U[uid];home();
+  await b.commit();me={tokens:[],...me,name,lang,photo:photoData,username:editing?me.username:un};delete U[uid];if(editing){setUI(lang);fetchUI(lang);profView("");toast(_("Saved"))}else home();
  }catch{e.textContent=editing?"Could not save. Try again.":_("That username is taken.")}
 };
 
@@ -443,7 +498,7 @@ function bubble(d){
  if(m.re)b.append(h("div","qt",m.re));
  if(m.loc){const a=h("a","",_("📍 Open location"));a.href="https://www.openstreetmap.org/?mlat="+m.loc[0]+"&mlon="+m.loc[1]+"#map=16/"+m.loc[0]+"/"+m.loc[1];a.target="_blank";a.rel="noopener";a.onclick=e=>e.stopPropagation();a.style.cssText="color:inherit;font-weight:600;text-decoration:underline";b.append(a)}
  if(m.img){const i=h("img");i.onclick=e=>{e.stopPropagation();$("#vwi").src=i.src;$("#vw").hidden=false};b.append(i);photo(m.img,i,b,cid)}
- if(m.text){x=h("span","",m.text);x.dir="auto";b.append(x);
+ if(m.text){x=h("span","",m.text);x.dir="auto";b.append(x);const big=bigEmoji(m.text);if(big){b.classList.add("big");x.textContent="";big.forEach(g=>x.append(aem(g,72)))}
   if(!mine&&m.lang&&base(m.lang)!==base(me.lang)&&!emoOnly(m.text)){
    const t=m.tr?.[key(me.lang)];
    if(t){if(!(m.src&&base(m.src)===base(me.lang))){
@@ -454,8 +509,14 @@ function bubble(d){
  const rxs=Object.values(m.rx||{});if(rxs.length){const rc=h("div","rx",rxs.join(" "));if(m.rx?.[uid]){rc.title=_("Tap to remove your reaction");rc.onclick=ev=>{ev.stopPropagation();updateDoc(d.ref,{["rx."+uid]:deleteField()}).catch(()=>{})}}b.append(rc)}
  const tmx=m.t?.toMillis?.();b.dataset.f=m.from;if(tmx){b.dataset.t=tmx;b.append(h("small","tm",hm(tmx)))}
  const rep=()=>{replyTo=(m.text||_("📷 Photo")).slice(0,100);$("#rpt").textContent=replyTo;$("#rp").hidden=false;$("#tx").focus()};
- let sx=0,sy=0;b.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});b.addEventListener("touchend",e=>{const t=e.changedTouches[0];if(t.clientX-sx>90&&Math.abs(t.clientY-sy)<30)rep()},{passive:true});
- b.onclick=()=>openMsg({d,m,x,mine,rep,cid});
+ const ctx={d,m,x,mine,rep,cid};let sx=0,sy=0,lp=0,fired=false;
+ const stop=()=>clearTimeout(lp),go=()=>{fired=true;try{navigator.vibrate&&navigator.vibrate(12)}catch{}openMsg(ctx)};
+ b.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;fired=false;stop();lp=setTimeout(go,450)},{passive:true});
+ b.addEventListener("touchmove",e=>{const t=e.touches[0];if(Math.abs(t.clientX-sx)>10||Math.abs(t.clientY-sy)>10)stop()},{passive:true});
+ b.addEventListener("touchend",e=>{stop();const t=e.changedTouches[0];if(!fired&&t.clientX-sx>90&&Math.abs(t.clientY-sy)<30)rep()},{passive:true});
+ b.addEventListener("touchcancel",stop,{passive:true});
+ b.addEventListener("contextmenu",e=>{e.preventDefault();stop();go()});
+ b.onclick=e=>{if(fired){fired=false;return}const n=b.querySelector("i");if(n)n.click()};
  return b}
 async function translate(ref,m,x){
  if(busy.has(ref.id))return;busy.add(ref.id);
@@ -524,7 +585,7 @@ $("#shp").onclick=async()=>{const g=$("#gal");g.replaceChildren(h("small","mu",_
 
 // ===== first-run intro =====
 let si=0;
-const slides=()=>[_("Write in your language. Your friend reads it in theirs."),_("Tap a message to reply, react or listen. Swipe right to reply."),_("Install Lingo: on iPhone tap Share, then Add to Home Screen. On Android tap Install.")];
+const slides=()=>[_("Write in your language. Your friend reads it in theirs."),_("Hold a message to reply, react or listen. Swipe right to reply."),_("Install Lingo: on iPhone tap Share, then Add to Home Screen. On Android tap Install.")];
 const drawIntro=()=>{const s=slides();$("#it").textContent=s[si];$("#iw").replaceChildren(...s.map((x,i)=>h("span","dotp"+(i===si?" f":""))));$("#in").textContent=_(si<2?"Next":"Done")};
 const showIntro=()=>{si=0;drawIntro();$("#intro").hidden=false};
 $("#in").onclick=()=>{if(si<2){si++;drawIntro()}else{$("#intro").hidden=true;PR.intro=1;savePR()}};
@@ -595,25 +656,25 @@ function watchInv(){unI?.();unI=onSnapshot(query(collection(db,"invites"),where(
 
 // ===== Chatloop-style home: friends row, filter chips, pinned chats, tab bar, message sheet =====
 let FC={},FLT="all";
-function setFilter(f){FLT=f;document.querySelectorAll("#chips .ch").forEach(c=>c.classList.toggle("on",c.dataset.f===f));$("#t1").classList.toggle("on",f!=="groups");$("#t2").classList.toggle("on",f==="groups");applyFilter()}
+function setFilter(f){FLT=f;document.querySelectorAll("#chips .ch").forEach(c=>c.classList.toggle("on",c.dataset.f===f));$("#t1").classList.toggle("on",f!=="groups");$("#t2").classList.toggle("on",f==="groups");$("#gbar").hidden=f!=="groups";applyFilter()}
 document.querySelectorAll("#chips .ch").forEach(c=>c.onclick=()=>setFilter(c.dataset.f));
 $("#t1").onclick=()=>setFilter("all");$("#t2").onclick=()=>setFilter("groups");$("#t3").onclick=()=>openSetup(true,me);
-function applyFilter(){const q=$("#un").value.trim().replace(/^@/,"").toLowerCase();let head=null;
+function applyFilter(){const q=$("#un").value.trim().replace(/^@/,"").toLowerCase();let head=null,vis=0;
  [...$("#list").children].forEach(e=>{if(e.classList.contains("sc")){head=e;e._n=0;return}if(!e.classList.contains("row"))return;
   const d=e.dataset,ok=(FLT==="all"||(FLT==="unread"&&d.u==="1")||(FLT==="groups"&&d.g==="1")||(FLT==="muted"&&d.m==="1"))&&(!q||(d.n||"").includes(q));
-  e.hidden=!ok;if(ok&&head)head._n++});
- $("#list").querySelectorAll(".sc").forEach(e=>e.hidden=!e._n)}
+  e.hidden=!ok;if(ok){vis++;if(head)head._n++}});
+ $("#list").querySelectorAll(".sc").forEach(e=>e.hidden=!e._n);$("#gempty").hidden=!(FLT==="groups"&&!vis)}
 function layout(){const L2=$("#list"),rs=[...L2.querySelectorAll(".row")],pins=PR.pins||[],pr=rs.filter(r=>pins.includes(r.dataset.id)),ot=rs.filter(r=>!pins.includes(r.dataset.id)),mk=t=>h("div","sc",_(t)),kids=[];
  if(pr.length)kids.push(mk("Pinned"),...pr);kids.push(mk("All chats"),...ot);
  L2.replaceChildren(...(rs.length?kids:[Object.assign(h("p","mu",_("No chats yet. Add a friend by username or share your invite link.")),{style:"padding:20px"})]));
  $("#c1").textContent=rs.filter(r=>r.dataset.u==="1").length||"";$("#c2").textContent=rs.filter(r=>r.dataset.g==="1").length||"";applyFilter()}
 function drawFriends(){const box=$("#frs"),ad=h("button","fr add"),ai=h("div","av");ai.innerHTML=svgi("plus");ad.append(ai,h("span","",_("Add")));ad.onclick=()=>$("#un").focus();
- box.replaceChildren(ad,...FR.slice(0,8).map(f=>{const b=h("button","fr"),l=(f.lang||"").split("-")[0];b.append(av(f),h("span","",(f.name||"").split(" ")[0]+(l?" · "+l:"")));b.onclick=()=>open(FC[f.id],f);return b}))}
+ box.replaceChildren(ad,...FR.slice(0,8).map(f=>{const b=h("button","fr"),l=(f.lang||"").split("-")[0];b.append(av(f),h("span","fn",(f.name||"").split(" ")[0]),h("small","fl",l));b.onclick=()=>open(FC[f.id],f);return b}))}
 $("#pin").onchange=()=>{const a=new Set(PR.pins||[]);$("#pin").checked?a.add(cur.id):a.delete(cur.id);PR.pins=[...a];savePR();layout()};
 function openMsg({d,m,x,mine,rep,cid}){const sh=$("#ms"),mr=m.rx?.[uid];
- $("#mq").textContent=x?x.textContent:(m.text||_("📷 Photo"));
+ $("#mq").textContent=(x&&x.textContent)||m.text||_("📷 Photo");
  const re=$("#mr");re.replaceChildren();
- ["👍","❤️","😂","😮","😢","🙏"].forEach(em=>{const bt=h("button","em"+(mr===em?" on":""),em);bt.onclick=()=>{updateDoc(d.ref,{["rx."+uid]:mr===em?deleteField():em}).catch(()=>{});sh.hidden=true};re.append(bt)});
+ ["👍","❤️","😂","😮","😢","🙏"].forEach(em=>{const bt=h("button","em"+(mr===em?" on":""));bt.setAttribute("aria-label",em);bt.append(aem(em,36));bt.onclick=()=>{updateDoc(d.ref,{["rx."+uid]:mr===em?deleteField():em}).catch(()=>{});sh.hidden=true;if(mr!==em)burst(em)};re.append(bt)});
  const ls=$("#ml");ls.replaceChildren();
  const item=(label,icon,f,red)=>{const b=h("button","ac"+(red?" red":"")),s=h("span");s.innerHTML=svgi(icon);b.append(h("span","",_(label)),s);b.onclick=()=>{sh.hidden=true;f()};ls.append(b)};
  item("Reply","reply",rep);
@@ -622,4 +683,25 @@ function openMsg({d,m,x,mine,rep,cid}){const sh=$("#ms"),mr=m.rx?.[uid];
  if(mine)item("Delete","trash",()=>{deleteDoc(d.ref);if(m.img)deleteDoc(doc(db,"chats",cid,"photos",m.img))},true);
  sh.hidden=false}
 $("#ms").onclick=e=>{if(e.target.id==="ms")$("#ms").hidden=true};
+
+// ===== profile sections, toast, long-press helpers, animated emoji =====
+let psec="";
+const TITLES={name:"Name and photo",lang:"Language",look:"Appearance",notif:"Notifications",lock:"App lock",invite:"Invite friends",about:"About"};
+function profView(s){psec=s;$("#hub").hidden=!!s;document.querySelectorAll("#setup .sec").forEach(e=>e.hidden=e.dataset.s!==s);
+ $("#st").textContent=_(s?TITLES[s]:"Profile");$("#se").textContent="";$("#sv1").hidden=$("#sv2").hidden=false;
+ if(s==="notif")notifUI();if(s)lockUI()}
+document.querySelectorAll("#hub .hb").forEach(b=>b.onclick=()=>profView(b.dataset.s));
+$("#pb").onclick=()=>psec?profView(""):home();
+$("#sv1").onclick=$("#sv").onclick;$("#sv2").onclick=$("#sv").onclick;
+{let ex=0,ey=0;const su=$("#setup");
+ su.addEventListener("touchstart",e=>{ex=e.touches[0].clientX;ey=e.touches[0].clientY},{passive:true});
+ su.addEventListener("touchend",e=>{const t=e.changedTouches[0];if(editing&&ex<40&&t.clientX-ex>80&&Math.abs(t.clientY-ey)<60)$("#pb").click()},{passive:true})}
+const notifUI=()=>{const on=typeof Notification!=="undefined"&&Notification.permission==="granted";$("#nt").textContent=_(on?"Notifications are on.":"Notifications are off on this device.");$("#nb").hidden=on};
+$("#nb").onclick=()=>{$("#bell").click();setTimeout(notifUI,2500)};
+$("#ngb").onclick=()=>pick("new");
+let tt=0;function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,1800)}
+const cpOf=ch=>[...ch].map(c=>c.codePointAt(0).toString(16)).join("_");
+function aem(ch,size){const i=h("img","ae");i.alt=ch;i.width=i.height=size;i.src="https://fonts.gstatic.com/s/e/notoemoji/latest/"+cpOf(ch)+"/512.webp";i.onerror=()=>{const s=h("span","",ch);s.style.fontSize=Math.round(size*.8)+"px";i.replaceWith(s)};return i}
+const bigEmoji=t=>{t=(t||"").trim();if(!t||!emoOnly(t))return null;const g=(typeof Intl.Segmenter==="function"?[...new Intl.Segmenter().segment(t)].map(x=>x.segment):[...t]).filter(x=>x.trim());return g.length&&g.length<=3?g:null};
+function burst(em){const w=h("div","burst");w.append(aem(em,140));document.body.append(w);setTimeout(()=>w.remove(),1000)}
 </script></body></html>
