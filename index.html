@@ -181,6 +181,16 @@ html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] inpu
 .hb{display:flex;align-items:center;gap:14px;width:100%;min-height:56px;padding:0 16px;border-radius:18px;border:1px solid var(--glb);background:var(--sf);color:var(--ink);font-size:16px;font-weight:600;text-align:start}
 .hb span{flex:1}.hb i{display:block;width:20px;height:20px;color:var(--ac)}.hb i:last-child{color:var(--mu)}.hb svg{width:20px;height:20px;display:block}
 .toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#101010;color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;z-index:60}
+/* ===== round 4 ===== */
+.b{position:relative}
+.rx{position:absolute;bottom:-14px;right:10px;padding:2px 7px;border-radius:14px;background:var(--sf);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.2);font-size:15px;line-height:1.3;cursor:pointer;z-index:1}
+.b.me .rx{right:auto;left:10px}
+.b.hasrx{padding-bottom:20px;margin-bottom:14px}
+.avw{position:relative;flex:none;display:block}.avw .av{display:grid}
+.pdot{position:absolute;right:0;bottom:0;width:14px;height:14px;border-radius:50%;background:#22c55e;border:2px solid #fff}
+.fr .pdot{border-color:#2154c4;right:2px;bottom:2px}
+#cl.online{color:#16a34a;font-weight:600}
+@media(prefers-color-scheme:dark){.pdot{border-color:#0e1623}#cl.online{color:#4ade80}}
 </style></head><body><div class="app">
 
 <section id="auth"><div class="pad" style="margin:auto 0">
@@ -201,6 +211,7 @@ html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] inpu
 <button class="hb" data-s="notif"><i data-i="bell"></i><span>Notifications</span><i data-i="chev"></i></button>
 <button class="hb" data-s="lock"><i data-i="lock"></i><span>App lock</span><i data-i="chev"></i></button>
 <button class="hb" data-s="invite"><i data-i="share"></i><span>Invite friends</span><i data-i="chev"></i></button>
+<button class="hb" data-s="privacy"><i data-i="eye"></i><span>Privacy</span><i data-i="chev"></i></button>
 <button class="hb" data-s="about"><i data-i="info"></i><span>About</span><i data-i="chev"></i></button>
 <button class="btn alt" id="so" style="margin-top:8px">Sign out</button>
 </div>
@@ -224,7 +235,7 @@ html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] inpu
 </div>
 <div class="sec" data-s="notif" hidden>
 <p class="mu" id="nt"></p>
-<button class="btn alt" id="nb">Turn on notifications</button>
+<label class="tg"><span>Notifications on this device</span><input type="checkbox" id="nsw"></label>
 </div>
 <div class="sec" data-s="lock" hidden>
 <button class="btn alt" id="lk">Set up app lock</button>
@@ -232,6 +243,10 @@ html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] inpu
 </div>
 <div class="sec" data-s="invite" hidden>
 <div id="invw" style="display:flex;gap:8px" hidden><button class="btn alt" id="inv">Copy invite link</button><button class="btn alt" id="qb" style="width:auto">QR code</button></div>
+</div>
+<div class="sec" data-s="privacy" hidden>
+<p class="mu">Friends can see when you are online.</p>
+<label class="tg"><span>Show when I'm online</span><input type="checkbox" id="shon"></label>
 </div>
 <div class="sec" data-s="about" hidden>
 <p class="mu">Lingo lets friends chat in their own languages.</p>
@@ -282,7 +297,7 @@ const V="https://www.gstatic.com/firebasejs/10.14.1/";
 const{initializeApp}=await import(V+"firebase-app.js");
 const{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,sendPasswordResetEmail}=await import(V+"firebase-auth.js");
 const{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,addDoc,deleteDoc,collection,query,where,orderBy,limit,onSnapshot,serverTimestamp,arrayUnion,writeBatch,Timestamp,deleteField,increment,arrayRemove}=await import(V+"firebase-firestore.js");
-const{getMessaging,getToken,isSupported}=await import(V+"firebase-messaging.js");
+const{getMessaging,getToken,isSupported,deleteToken}=await import(V+"firebase-messaging.js");
 const app=initializeApp(CFG.firebase),auth=getAuth(app),db=getFirestore(app);
 
 const L=[["AR","العربية"],["BG","Български"],["CS","Čeština"],["DA","Dansk"],["DE","Deutsch"],["EL","Ελληνικά"],["EN-US","English (US)"],["EN-GB","English (UK)"],["ES","Español"],["ET","Eesti"],["FI","Suomi"],["FR","Français"],["HU","Magyar"],["ID","Bahasa Indonesia"],["IT","Italiano"],["JA","日本語"],["KO","한국어"],["LT","Lietuvių"],["LV","Latviešu"],["NB","Norsk"],["NL","Nederlands"],["PL","Polski"],["PT-BR","Português (Brasil)"],["PT-PT","Português (Portugal)"],["RO","Română"],["RU","Русский"],["SK","Slovenčina"],["SL","Slovenščina"],["SV","Svenska"],["TR","Türkçe"],["UK","Українська"],["ZH","中文 (简体)"]];
@@ -299,6 +314,7 @@ const IC={bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M1
 IC.camera='<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>';IC.pin='<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>';IC.users='<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>';
 IC.msg='<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>';IC.info='<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>';IC.reply='<path d="m9 17-5-5 5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>';IC.vol='<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>';IC.copy='<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>';IC.trash='<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>';IC.check2='<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>';
 IC.globe='<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>';IC.sliders='<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/>';IC.lock='<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>';IC.share='<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>';IC.chev='<path d="m9 18 6-6-6-6"/>';
+IC.eye='<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>';IC.edit='<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>';
 document.querySelectorAll("[data-i]").forEach(e=>e.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[e.dataset.i]+"</svg>");
 const T=[
 ["Chat with friends in your own language. Every message is translated for you.","Converse com amigos no seu idioma. Cada mensagem é traduzida para você.","Discutez avec vos amis dans votre langue. Chaque message est traduit pour vous.","Chatte mit Freunden in deiner Sprache. Jede Nachricht wird für dich übersetzt."],
@@ -356,7 +372,8 @@ const T=[
 ["Enter PIN"],["Create a 4-digit PIN"],["Confirm your PIN"],["PINs don't match. Try again."],["Wrong PIN"],["Too many tries. Try again later."],
 ["New group"],["Group name"],["Create group"],["Send invites"],["Add members"],["Rename group"],["Leave group"],["New group name"],["Group invitation"],["Invited by"],["Decline"],["members"],["Admin"],["Select friends to invite"],["No friends to add yet."],["Enter a group name."],["Could not create the group."],
 ["Friends and languages"],["All"],["Unread"],["Muted"],["Pinned"],["All chats"],["Groups"],["Add"],["Pin chat"],["Copy"],
-["Name and photo"],["Language"],["Notifications"],["Invite friends"],["About"],["Your photo and name are shown to your friends."],["Choose the language you read and write in."],["Changes here apply right away."],["Notifications are on."],["Notifications are off on this device."],["Lingo lets friends chat in their own languages."],["Animated emoji: Google Noto Emoji Animation (CC BY 4.0)."],["Saved"],["No groups yet. Tap New group to create one."]
+["Name and photo"],["Language"],["Notifications"],["Invite friends"],["About"],["Your photo and name are shown to your friends."],["Choose the language you read and write in."],["Changes here apply right away."],["Notifications are on."],["Notifications are off on this device."],["Lingo lets friends chat in their own languages."],["Animated emoji: Google Noto Emoji Animation (CC BY 4.0)."],["Saved"],["No groups yet. Tap New group to create one."],
+["Edit"],["edited"],["Editing message"],["Online"],["Last seen"],["Privacy"],["Friends can see when you are online."],["Show when I'm online"],["Notifications on this device"]
 ];
 const DICT={PT:{},FR:{},DE:{}};T.forEach(r=>{DICT.PT[r[0]]=r[1];DICT.FR[r[0]]=r[2];DICT.DE[r[0]]=r[3]});
 let UIL="EN";const _=s=>DICT[UIL]?.[s]||s,EN=new Set(T.map(r=>r[0])),reg=[];
@@ -378,7 +395,7 @@ $("#tip").onclick=()=>{PR.tip=1;savePR();$("#tip").hidden=true};
 $("#vw").onclick=()=>$("#vw").hidden=true;
 $("#un").oninput=()=>applyFilter();
 const post=bx=>{const a=[...bx.children];a.forEach((e,i)=>{const f=e.dataset.f;e.classList.toggle("cont",!!f&&a[i-1]?.dataset.f===f);e.classList.toggle("nxt",!!f&&a[i+1]?.dataset.f===f);
- if(f===uid&&e.dataset.t){const tm=e.querySelector(".tm");if(tm)tm.textContent=hm(+e.dataset.t)+" "+(cur?.seen>=+e.dataset.t?"✓✓":"✓")}})};
+ if(f===uid&&e.dataset.t){const tm=e.querySelector(".tm");if(tm)tm.textContent=hm(+e.dataset.t)+(e.dataset.ed?" · "+_("edited"):"")+" "+(cur?.seen>=+e.dataset.t?"✓✓":"✓")}})};
 let uiTok=0;
 async function fetchUI(lang){
  if(!lang||!auth.currentUser)return;const u=base(lang).toUpperCase();if(u==="EN")return;const tok=++uiTok,ck="ui2_"+u;
@@ -434,20 +451,20 @@ $("#sv").onclick=async()=>{
 
 // ---- Chat list & friends ----
 function home(){
- setUI(me.lang);fetchUI(me.lang);lockCheck();watchInv();if(!PR.intro&&$("#intro").hidden)showIntro();show("home");cur=null;unM?.();unC?.();unT?.();
- $("#bell").hidden=typeof Notification!=="undefined"&&Notification.permission==="granted";
+ setUI(me.lang);fetchUI(me.lang);lockCheck();watchInv();beat();if(!PR.intro&&$("#intro").hidden)showIntro();show("home");cur=null;unM?.();unC?.();unT?.();unP?.();
+ $("#bell").hidden=typeof Notification!=="undefined"&&Notification.permission==="granted"&&!PR.pushOff;
  unC=onSnapshot(query(collection(db,"chats"),where("members","array-contains",uid)),async s=>{
   const cs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.updated?.seconds||9e9)-(a.updated?.seconds||9e9)).filter(c=>{const hs=c.hidden?.[uid]?.seconds;return!(hs&&(c.updated?.seconds||0)<=hs)});
   FR=[];FC={};const rows=await Promise.all(cs.map(async c=>{const o=c.group?{id:c.id,name:c.name,group:true}:await user(c.members.find(x=>x!==uid));if(!c.group&&c.status==="active"){FR.push(o);FC[o.id]=c}return row(c,o)}));
-  $("#list").replaceChildren(...rows);layout();drawFriends();
+  $("#list").replaceChildren(...rows);layout();drawFriends();refreshFriends();
  });
  const a=new URLSearchParams(location.search).get("add");if(a){history.replaceState(0,"",location.pathname);request(a)}
 }
 function row(c,o){
  const b=h("button","row"),t=h("div"),pend=c.status==="pending",incoming=pend&&c.from!==uid;
  t.append(h("b","",o.name),h("small","",pend?(incoming?_("Wants to chat with you"):_("Request sent")):c.last||_("Say hi 👋")));
- const r=h("div","rc");r.append(h("small","",lt(c.updated)));if(incoming)r.append(h("span","pill",_("Accept")));const un=c.unread?.[uid]||0;if(un)r.append(h("span","badge",un>99?"99+":String(un)));b.dataset.u=un?"1":"0";b.dataset.g=c.group?"1":"0";b.dataset.m=c.muted?.[uid]?"1":"0";b.dataset.id=c.id;
- if(c.lastFrom===uid&&c.status!=="pending"){const k=h("span","tk"),oth=c.members.find(x=>x!==uid);k.innerHTML=svgi("check2");if(!c.group&&(c.seen?.[oth]?.seconds||0)>=(c.updated?.seconds||0))k.style.color="var(--ac)";r.append(k)}b.dataset.n=(o.name||"").toLowerCase();b.append(av(o),t,r);
+ const r=h("div","rc");r.append(h("small","",lt(c.updated)));if(incoming)r.append(h("span","pill",_("Accept")));const un=c.unread?.[uid]||0;if(un)r.append(h("span","badge",un>99?"99+":String(un)));b.dataset.u=un?"1":"0";b.dataset.g=c.group?"1":"0";b.dataset.m=c.muted?.[uid]?"1":"0";b.dataset.id=c.id;b.dataset.o=c.group?"":(c.members.find(x=>x!==uid)||"");
+ if(c.lastFrom===uid&&c.status!=="pending"){const k=h("span","tk"),oth=c.members.find(x=>x!==uid);k.innerHTML=svgi("check2");if(!c.group&&(c.seen?.[oth]?.seconds||0)>=(c.updated?.seconds||0))k.style.color="var(--ac)";r.append(k)}b.dataset.n=(o.name||"").toLowerCase();b.append(avw(o,!c.group&&isOn(o)),t,r);
  b.onclick=async()=>{if(pend){if(!incoming)return;await updateDoc(doc(db,"chats",c.id),{status:"active"})}open(c,o)};
  return b}
 async function request(un){
@@ -464,7 +481,7 @@ const inviteUrl=()=>location.origin+location.pathname+"?add="+me.username;
 $("#inv").onclick=async()=>{await navigator.clipboard.writeText(inviteUrl());$("#inv").textContent=_("Copied!");setTimeout(()=>$("#inv").textContent=_("Copy invite link"),1500)};
 $("#qb").onclick=()=>{const q=qrcode(0,"M");q.addData(inviteUrl());q.make();$("#qrimg").innerHTML=q.createSvgTag({scalable:true});$("#qr").hidden=false};
 $("#qr").onclick=()=>$("#qr").hidden=true;
-$("#bell").onclick=async()=>{try{
+$("#bell").onclick=async()=>{PR.pushOff=0;savePR();try{
  if(!(await isSupported()))return $("#he").textContent="On iPhone: tap Share, then Add to Home Screen, and open Lingo from there.";
  if(await Notification.requestPermission()!=="granted")return;
  const reg=await navigator.serviceWorker.register("firebase-messaging-sw.js");
@@ -474,7 +491,7 @@ $("#bell").onclick=async()=>{try{
 
 // ---- Conversation ----
 async function open(c,o){
- cur={id:c.id,o,blocked:"",group:!!c.group,members:c.members||[],admin:c.admin,name:c.name};if(c.group)await Promise.all(c.members.map(user));replyTo=null;$("#rp").hidden=true;$("#ty").hidden=true;$("#tip").hidden=!!PR.tip;show("chat");applyChat(c.id);$("#cn").textContent=o.name;$("#cl").textContent=L.find(l=>l[0]===o.lang)?.[1]||"";$("#cav").replaceChildren(av(o));$("#msgs").replaceChildren();$("#emo").classList.remove("on");
+ cur={id:c.id,o,blocked:"",group:!!c.group,members:c.members||[],admin:c.admin,name:c.name};if(c.group)await Promise.all(c.members.map(user));replyTo=null;$("#rp").hidden=true;$("#ty").hidden=true;$("#tip").hidden=!!PR.tip;show("chat");applyChat(c.id);$("#cn").textContent=o.name;hdr();unP?.();unP=c.group?null:onSnapshot(doc(db,"users",o.id),s=>{if(s.exists()){U[o.id]={...U[o.id],id:o.id,...s.data()};hdr()}},()=>{});$("#cav").replaceChildren(av(o));$("#msgs").replaceChildren();$("#emo").classList.remove("on");
  const cref=doc(db,"chats",c.id),seen=()=>updateDoc(cref,{["seen."+uid]:serverTimestamp(),["unread."+uid]:0}).catch(()=>{});
  getDocs(query(collection(db,"chats",c.id,"photos"),where("expireAt","<",Timestamp.now()))).then(s=>s.forEach(d=>d.data().from===uid&&deleteDoc(d.ref))).catch(()=>{});
  let first=true,n=50,keep=0,shown=0,tm;unT?.();
@@ -506,8 +523,8 @@ function bubble(d){
      x.textContent=t;if(PR.both){const o=h("div","orig",m.text);o.dir="auto";b.append(o)}b.append(n);
      n.onclick=e=>{e.stopPropagation();const o=n.dataset.o;n.dataset.o=o?"":"1";x.textContent=o?t:m.text;n.textContent=o?lbl:_("Original · tap for translation")}}}
    else if(!paused){x.textContent=_("Translating…");x.style.opacity=.6;translate(d.ref,m,x)}}}
- const rxs=Object.values(m.rx||{});if(rxs.length){const rc=h("div","rx",rxs.join(" "));if(m.rx?.[uid]){rc.title=_("Tap to remove your reaction");rc.onclick=ev=>{ev.stopPropagation();updateDoc(d.ref,{["rx."+uid]:deleteField()}).catch(()=>{})}}b.append(rc)}
- const tmx=m.t?.toMillis?.();b.dataset.f=m.from;if(tmx){b.dataset.t=tmx;b.append(h("small","tm",hm(tmx)))}
+ const rxs=Object.values(m.rx||{});if(rxs.length){b.classList.add("hasrx");const rc=h("div","rx",[...new Set(rxs)].slice(0,3).join("")+(rxs.length>1?" "+rxs.length:""));if(m.rx?.[uid]){rc.title=_("Tap to remove your reaction");rc.onclick=ev=>{ev.stopPropagation();updateDoc(d.ref,{["rx."+uid]:deleteField()}).catch(()=>{})}}b.append(rc)}
+ const tmx=m.t?.toMillis?.();b.dataset.f=m.from;b.dataset.ed=m.edited?"1":"";if(tmx){b.dataset.t=tmx;b.append(h("small","tm",hm(tmx)+(m.edited?" · "+_("edited"):"")))}
  const rep=()=>{replyTo=(m.text||_("📷 Photo")).slice(0,100);$("#rpt").textContent=replyTo;$("#rp").hidden=false;$("#tx").focus()};
  const ctx={d,m,x,mine,rep,cid};let sx=0,sy=0,lp=0,fired=false;
  const stop=()=>clearTimeout(lp),go=()=>{fired=true;try{navigator.vibrate&&navigator.vibrate(12)}catch{}openMsg(ctx)};
@@ -526,6 +543,7 @@ async function photo(pid,img,b,cid){
  if(!(pid in P))try{P[pid]=(await getDoc(doc(db,"chats",cid,"photos",pid))).data()||null}catch{P[pid]=null}
  const p=P[pid];if(p&&p.expireAt.toMillis()>Date.now())img.src=p.data;else{img.remove();b.prepend(h("i","",_("Photo expired")))}}
 async function send(img,extra){
+ if(editRef){const t=$("#tx").value.trim();if(t){try{await updateDoc(editRef,{text:t,edited:true,lang:me.lang,tr:deleteField(),src:deleteField()})}catch{}}editRef=null;$("#tx").value="";setSd();$("#rp").hidden=true;return}
  const text=$("#tx").value.trim();if(!cur||(!text&&!img&&!extra))return;$("#tx").value="";setSd();$("#emo").classList.remove("on");
  const cid=cur.id,grp=cur.group,mm=cur.mutedMap||{},others=grp?cur.members.filter(x=>x!==uid):[cur.o.id],gname=cur.name;let pid=null;
  try{if(img){pid=doc(collection(db,"chats",cid,"photos")).id;
@@ -544,7 +562,7 @@ const speak=t=>{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t)
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 const dictate=()=>{const r=new SR();r.lang=bcp(me.lang);r.onresult=e=>{$("#tx").value+=($("#tx").value?" ":"")+e.results[0][0].transcript;setSd()};r.onend=()=>$("#sd").style.opacity=1;$("#sd").style.opacity=.5;r.start()};
 $("#tx").oninput=()=>{if(cur&&Date.now()-lastT>3000){lastT=Date.now();updateDoc(doc(db,"chats",cur.id),{["typing."+uid]:serverTimestamp()}).catch(()=>{})}};
-$("#rp").onclick=()=>{replyTo=null;$("#rp").hidden=true};
+$("#rp").onclick=()=>{replyTo=null;$("#rp").hidden=true;if(editRef){editRef=null;$("#tx").value="";setSd()}};
 $("#mn").onclick=()=>{$("#blk").textContent=cur.blocked===uid?_("Unblock"):_("Block");$("#blk").hidden=!!cur.blocked&&cur.blocked!==uid;$("#mnu").hidden=false};
 $("#mx").onclick=()=>$("#mnu").hidden=true;
 $("#blk").onclick=async()=>{await updateDoc(doc(db,"chats",cur.id),{blocked:cur.blocked===uid?deleteField():uid}).catch(()=>{});$("#mnu").hidden=true};
@@ -669,7 +687,7 @@ function layout(){const L2=$("#list"),rs=[...L2.querySelectorAll(".row")],pins=P
  L2.replaceChildren(...(rs.length?kids:[Object.assign(h("p","mu",_("No chats yet. Add a friend by username or share your invite link.")),{style:"padding:20px"})]));
  $("#c1").textContent=rs.filter(r=>r.dataset.u==="1").length||"";$("#c2").textContent=rs.filter(r=>r.dataset.g==="1").length||"";applyFilter()}
 function drawFriends(){const box=$("#frs"),ad=h("button","fr add"),ai=h("div","av");ai.innerHTML=svgi("plus");ad.append(ai,h("span","",_("Add")));ad.onclick=()=>$("#un").focus();
- box.replaceChildren(ad,...FR.slice(0,8).map(f=>{const b=h("button","fr"),l=(f.lang||"").split("-")[0];b.append(av(f),h("span","fn",(f.name||"").split(" ")[0]),h("small","fl",l));b.onclick=()=>open(FC[f.id],f);return b}))}
+ box.replaceChildren(ad,...FR.slice(0,8).map(f=>{const b=h("button","fr"),l=(f.lang||"").split("-")[0];b.dataset.o=f.id;b.append(avw(f,isOn(f)),h("span","fn",(f.name||"").split(" ")[0]),h("small","fl",l));b.onclick=()=>open(FC[f.id],f);return b}))}
 $("#pin").onchange=()=>{const a=new Set(PR.pins||[]);$("#pin").checked?a.add(cur.id):a.delete(cur.id);PR.pins=[...a];savePR();layout()};
 function openMsg({d,m,x,mine,rep,cid}){const sh=$("#ms"),mr=m.rx?.[uid];
  $("#mq").textContent=(x&&x.textContent)||m.text||_("📷 Photo");
@@ -680,28 +698,49 @@ function openMsg({d,m,x,mine,rep,cid}){const sh=$("#ms"),mr=m.rx?.[uid];
  item("Reply","reply",rep);
  if(x&&!mine)item("Listen","vol",()=>speak(x.textContent));
  if(m.text)item("Copy","copy",()=>{try{navigator.clipboard.writeText(m.text)}catch{}});
+ if(mine&&m.text)item("Edit","edit",()=>startEdit(d,m));
  if(mine)item("Delete","trash",()=>{deleteDoc(d.ref);if(m.img)deleteDoc(doc(db,"chats",cid,"photos",m.img))},true);
  sh.hidden=false}
 $("#ms").onclick=e=>{if(e.target.id==="ms")$("#ms").hidden=true};
 
 // ===== profile sections, toast, long-press helpers, animated emoji =====
 let psec="";
-const TITLES={name:"Name and photo",lang:"Language",look:"Appearance",notif:"Notifications",lock:"App lock",invite:"Invite friends",about:"About"};
+const TITLES={name:"Name and photo",lang:"Language",look:"Appearance",notif:"Notifications",lock:"App lock",invite:"Invite friends",about:"About",privacy:"Privacy"};
 function profView(s){psec=s;$("#hub").hidden=!!s;document.querySelectorAll("#setup .sec").forEach(e=>e.hidden=e.dataset.s!==s);
  $("#st").textContent=_(s?TITLES[s]:"Profile");$("#se").textContent="";$("#sv1").hidden=$("#sv2").hidden=false;
- if(s==="notif")notifUI();if(s)lockUI()}
+ if(s==="notif")notifUI();if(s==="privacy")$("#shon").checked=me.showOnline!==false;if(s)lockUI()}
 document.querySelectorAll("#hub .hb").forEach(b=>b.onclick=()=>profView(b.dataset.s));
 $("#pb").onclick=()=>psec?profView(""):home();
 $("#sv1").onclick=$("#sv").onclick;$("#sv2").onclick=$("#sv").onclick;
 {let ex=0,ey=0;const su=$("#setup");
  su.addEventListener("touchstart",e=>{ex=e.touches[0].clientX;ey=e.touches[0].clientY},{passive:true});
  su.addEventListener("touchend",e=>{const t=e.changedTouches[0];if(editing&&ex<40&&t.clientX-ex>80&&Math.abs(t.clientY-ey)<60)$("#pb").click()},{passive:true})}
-const notifUI=()=>{const on=typeof Notification!=="undefined"&&Notification.permission==="granted";$("#nt").textContent=_(on?"Notifications are on.":"Notifications are off on this device.");$("#nb").hidden=on};
-$("#nb").onclick=()=>{$("#bell").click();setTimeout(notifUI,2500)};
+const notifUI=()=>{const on=typeof Notification!=="undefined"&&Notification.permission==="granted"&&!PR.pushOff;$("#nt").textContent=_(on?"Notifications are on.":"Notifications are off on this device.");$("#nsw").checked=on};
+
 $("#ngb").onclick=()=>pick("new");
 let tt=0;function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,1800)}
 const cpOf=ch=>[...ch].map(c=>c.codePointAt(0).toString(16)).join("_");
 function aem(ch,size){const i=h("img","ae");i.alt=ch;i.width=i.height=size;i.src="https://fonts.gstatic.com/s/e/notoemoji/latest/"+cpOf(ch)+"/512.webp";i.onerror=()=>{const s=h("span","",ch);s.style.fontSize=Math.round(size*.8)+"px";i.replaceWith(s)};return i}
 const bigEmoji=t=>{t=(t||"").trim();if(!t||!emoOnly(t))return null;const g=(typeof Intl.Segmenter==="function"?[...new Intl.Segmenter().segment(t)].map(x=>x.segment):[...t]).filter(x=>x.trim());return g.length&&g.length<=3?g:null};
 function burst(em){const w=h("div","burst");w.append(aem(em,140));document.body.append(w);setTimeout(()=>w.remove(),1000)}
+
+// ===== online status, editing messages, notifications switch =====
+let unP,editRef=null;
+const ONMS=100000;
+const isOn=u=>!!u&&u.showOnline!==false&&!!u.lastActive?.toMillis&&Date.now()-u.lastActive.toMillis()<ONMS;
+const presence=u=>{if(!u||u.showOnline===false||!u.lastActive?.toMillis)return"";if(isOn(u))return _("Online");const ms=u.lastActive.toMillis(),d=dayLbl(ms);return _("Last seen")+" "+(d===_("Today")?hm(ms):d+" "+hm(ms))};
+function hdr(){if(!cur||cur.group)return;const o=cur.o,u=U[o.id]||o,ln=L.find(l=>l[0]===u.lang)?.[1]||"";$("#cl").textContent=[presence(u),ln].filter(Boolean).join(" · ");$("#cl").classList.toggle("online",isOn(u))}
+const avw=(o,on)=>{const w=h("span","avw");w.append(av(o));if(on)w.append(h("span","pdot"));return w};
+function paintPresence(){document.querySelectorAll("#list .row[data-o],#frs .fr[data-o]").forEach(r=>{const id=r.dataset.o,w=r.querySelector(".avw");if(!id||!w)return;const d=w.querySelector(".pdot"),on=isOn(U[id]);if(on&&!d)w.append(h("span","pdot"));if(!on&&d)d.remove()})}
+async function refreshFriends(){const ids=[...new Set([...$("#list").querySelectorAll(".row[data-o]")].map(r=>r.dataset.o).filter(Boolean))].slice(0,30);
+ await Promise.all(ids.map(async id=>{try{const s=await getDoc(doc(db,"users",id));if(s.exists())U[id]={...U[id],id,...s.data()}}catch{}}));paintPresence()}
+const beat=force=>{if(!uid||!me||me.showOnline===false)return;if(document.hidden&&!force)return;updateDoc(doc(db,"users",uid),{lastActive:serverTimestamp()}).catch(()=>{})};
+setInterval(()=>beat(),45000);document.addEventListener("visibilitychange",()=>beat(true));
+setInterval(()=>{hdr();paintPresence()},20000);
+setInterval(()=>{if(auth.currentUser&&!document.hidden&&$("#home").classList.contains("on"))refreshFriends()},60000);
+$("#shon").onchange=()=>{const v=$("#shon").checked;me.showOnline=v;updateDoc(doc(db,"users",uid),{showOnline:v,...(v?{lastActive:serverTimestamp()}:{})}).catch(()=>{})};
+function startEdit(d,m){editRef=d.ref;$("#tx").value=m.text;setSd();$("#rpt").textContent=_("Editing message");$("#rp").hidden=false;$("#tx").focus()}
+async function disablePush(){try{const msg=getMessaging(app),reg=await navigator.serviceWorker.register("firebase-messaging-sw.js"),t=await getToken(msg,{vapidKey:CFG.vapid,serviceWorkerRegistration:reg});
+ if(t)await updateDoc(doc(db,"users",uid),{tokens:arrayRemove(t)});await deleteToken(msg)}catch{}PR.pushOff=1;savePR();$("#bell").hidden=false}
+$("#nsw").onchange=async()=>{if($("#nsw").checked){$("#bell").click();setTimeout(notifUI,2500)}else{await disablePush();notifUI()}};
 </script></body></html>
