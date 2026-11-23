@@ -253,6 +253,15 @@ html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] inpu
 .pmem__nav{display:flex;flex-shrink:0;align-items:center;gap:2px}
 .pmem__nav button{display:grid;place-items:center;width:32px;height:32px;border-radius:9999px;color:var(--foot)}
 .pmem__nav button[aria-disabled="true"]{opacity:.4;cursor:default}.pmem__nav svg{width:19px;height:19px}
+/* ===== Create New Group: button in the Groups tab, card opens as a popup ===== */
+.pmbtn{width:352px;max-width:100%;padding:10px;border-radius:32px;background:linear-gradient(160deg,#2F78DB,#1E4FB8);box-shadow:0 18px 36px -24px rgb(30 79 184/.55),0 2px 6px rgb(15 23 42/.05);transition:transform .2s cubic-bezier(.22,1,.36,1)}
+.pmbtn:active{transform:scale(.98)}
+.pmbtn__card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px;border-radius:20px;background:var(--sf);color:var(--ink);text-align:start}
+.pmbtn__t{font-size:17px;font-weight:800;line-height:1;letter-spacing:-.01em}
+.pmbtn__i{display:grid;place-items:center;width:24px;height:24px}.pmbtn__i svg{width:22px;height:22px;display:block}
+.pmpop{position:fixed;inset:0;z-index:25;display:flex;overflow:auto;padding:20px 12px;background:rgba(10,16,28,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:pmFade .22s ease-out}
+.pmpop__in{margin:auto;width:100%;display:flex;justify-content:center}
+@keyframes pmFade{from{opacity:0}}
 </style></head><body><div class="app">
 
 <section id="auth"><div class="pad" style="margin:auto 0">
@@ -322,7 +331,7 @@ html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] inpu
 <div class="sb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="un" placeholder="Search chats or add by @username" autocapitalize="none"><button class="ib" id="add" title="Send request" data-i="plus"></button></div>
 <p class="err" id="he"></p></div>
 <div class="chips" id="chips"><button class="ch on" data-f="all">All</button><button class="ch" data-f="unread">Unread <b class="cn" id="c1"></b></button><button class="ch" data-f="groups">Groups <b class="cn" id="c2"></b></button><button class="ch" data-f="muted">Muted</button></div>
-<div id="gbar" hidden style="padding:6px 16px 0;display:flex;justify-content:center"><div id="pmhost"></div></div><p class="mu" id="gempty" hidden style="padding:8px 20px">No groups yet. Tap New group to create one.</p>
+<div id="gbar" hidden style="padding:6px 16px 0;display:flex;justify-content:center"><button class="pmbtn" id="pmopen" type="button"><span class="pmbtn__card"><span class="pmbtn__t">Create New Group</span><span class="pmbtn__i" data-i="plus"></span></span></button></div><p class="mu" id="gempty" hidden style="padding:8px 20px">No groups yet. Tap Create New Group to start one.</p>
 <div id="invs"></div><div class="list" id="list"></div>
 <nav class="tabs"><button id="t1" class="on"><i data-i="msg"></i><span>Chats</span></button><button id="t2" aria-label="Groups"><i data-i="users"></i><span>Groups</span></button><button id="t3" aria-label="Profile"><i data-i="user"></i><span>Profile</span></button></nav></section>
 
@@ -351,6 +360,7 @@ html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] inpu
 <div class="sheet" id="grp" hidden><div class="card" style="text-align:start;max-height:88vh;overflow:auto"><h2 id="gt" style="margin-bottom:10px">New group</h2><input id="gn" placeholder="Group name" maxlength="40"><div id="gl" style="margin:10px 0"></div><p class="err" id="ge"></p><button class="btn" id="gc">Create group</button><button class="btn alt" id="gx">Cancel</button></div></div>
 <div class="sheet" id="ms" hidden><div class="msheet"><div class="grab"></div><div class="mq" id="mq"></div><div class="rl">React</div><div class="remo" id="mr"></div><div id="ml"></div></div></div>
 <div class="toast" id="toast" hidden></div>
+<div class="pmpop" id="pmpop" hidden><div class="pmpop__in" id="pmin"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/motion@11.18.2/dist/motion.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script type="module">
@@ -435,7 +445,7 @@ const T=[
 ["Enter PIN"],["Create a 4-digit PIN"],["Confirm your PIN"],["PINs don't match. Try again."],["Wrong PIN"],["Too many tries. Try again later."],
 ["New group"],["Group name"],["Create group"],["Send invites"],["Add members"],["Rename group"],["Leave group"],["New group name"],["Group invitation"],["Invited by"],["Decline"],["members"],["Admin"],["Select friends to invite"],["No friends to add yet."],["Enter a group name."],["Could not create the group."],
 ["Friends and languages"],["All"],["Unread"],["Muted"],["Pinned"],["All chats"],["Groups"],["Add"],["Pin chat"],["Copy"],
-["Name and photo"],["Language"],["Notifications"],["Invite friends"],["About"],["Your photo and name are shown to your friends."],["Choose the language you read and write in."],["Changes here apply right away."],["Notifications are on."],["Notifications are off on this device."],["Lingo lets friends chat in their own languages."],["Animated emoji: Google Noto Emoji Animation (CC BY 4.0)."],["Saved"],["No groups yet. Tap New group to create one."],
+["Name and photo"],["Language"],["Notifications"],["Invite friends"],["About"],["Your photo and name are shown to your friends."],["Choose the language you read and write in."],["Changes here apply right away."],["Notifications are on."],["Notifications are off on this device."],["Lingo lets friends chat in their own languages."],["Animated emoji: Google Noto Emoji Animation (CC BY 4.0)."],["Saved"],["No groups yet. Tap Create New Group to start one."],
 ["Edit"],["edited"],["Editing message"],["Online"],["Last seen"],["Privacy"],["Friends can see when you are online."],["Show when I'm online"],["Notifications on this device"],
 ["Create New Group"],["Search friends"],["View all friends"],["Group created"],["selected"],["No friends match your search."]
 ];
@@ -738,7 +748,7 @@ function watchInv(){unI?.();unI=onSnapshot(query(collection(db,"invites"),where(
 
 // ===== Chatloop-style home: friends row, filter chips, pinned chats, tab bar, message sheet =====
 let FC={},FLT="all";
-function setFilter(f){FLT=f;document.querySelectorAll("#chips .ch").forEach(c=>c.classList.toggle("on",c.dataset.f===f));$("#t1").classList.toggle("on",f!=="groups");$("#t2").classList.toggle("on",f==="groups");$("#gbar").hidden=f!=="groups";if(f==="groups"&&!PM)PM=PinAdd($("#pmhost"),createGroup);applyFilter()}
+function setFilter(f){FLT=f;document.querySelectorAll("#chips .ch").forEach(c=>c.classList.toggle("on",c.dataset.f===f));$("#t1").classList.toggle("on",f!=="groups");$("#t2").classList.toggle("on",f==="groups");$("#gbar").hidden=f!=="groups";applyFilter()}
 document.querySelectorAll("#chips .ch").forEach(c=>c.onclick=()=>setFilter(c.dataset.f));
 $("#t1").onclick=()=>setFilter("all");$("#t2").onclick=()=>setFilter("groups");$("#t3").onclick=()=>openSetup(true,me);
 function applyFilter(){const q=$("#un").value.trim().replace(/^@/,"").toLowerCase();let head=null,vis=0;
@@ -816,8 +826,8 @@ const settle=(a,ms)=>Promise.race([new Promise(r=>a.then(r)),new Promise(r=>setT
 const commit=(el,st)=>{if(el)Object.assign(el.style,st)};
 const press=(el,down,up={scale:1})=>{el.addEventListener("pointerdown",e=>{if(e.button===0)animate(el,down,SNAP)});["pointerup","pointerleave","pointercancel"].forEach(t=>el.addEventListener(t,()=>animate(el,up,SNAP)))};
 const SV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
-return function PinAdd(host,onCreate){
- const PER=4,gid="pmem-goo-"+Math.random().toString(36).slice(2,8);
+return function PinAdd(host,onCreate,opts={}){
+ const PER=window.innerHeight<720?3:4,gid="pmem-goo-"+Math.random().toString(36).slice(2,8);
  let query="",page=0,picked=[],isOpen=false,confirming=false,busy=false,barShown=false,paint=0;
  const mem=()=>FR.map(f=>{const u=U[f.id]||f;return{id:f.id,u,name:u.name||"?",role:L.find(l=>l[0]===u.lang)?.[1]||"",status:isOn(u)?"online":"offline"}});
  const hit=()=>{const n=query.trim().toLowerCase();return mem().filter(m=>!n||m.name.toLowerCase().includes(n)||m.role.toLowerCase().includes(n))};
@@ -881,7 +891,7 @@ return function PinAdd(host,onCreate){
   animate(cta,{scale:[1,.94,1.03,1]},{duration:.5,ease:EASE});animate(check,{scale:[0,1],rotate:[-25,0]},SNAP);
   const cs=stack.querySelectorAll(".pmem__chip");if(cs.length)animate(cs,{y:[0,-6,0]},{duration:.45,ease:EASE,delay:stagger(.05)});
   await new Promise(r=>setTimeout(r,1500));
-  list.querySelectorAll(".pmem__toggle.is-on").forEach(b=>setToggle(b,false));await hideBar();picked=[];renderStack();nameIn.value="";ctaReset();
+  list.querySelectorAll(".pmem__toggle.is-on").forEach(b=>setToggle(b,false));await hideBar();picked=[];renderStack();nameIn.value="";ctaReset();opts.onClose?.();
  }
  /* ---- open / collapse ---- */
  const measure=()=>{const p=body.style.height;body.style.height="auto";const v=body.scrollHeight;body.style.height=p;return v};
@@ -915,7 +925,7 @@ return function PinAdd(host,onCreate){
   if(rs.length)await settle(animate(rs,{opacity:0,x:-d*18},{duration:.2,ease:EASE,delay:stagger(.03,{from:d>0?"first":"last"})}),500);
   const pc=pageCount();page=(page+d+pc)%pc;renderList();enterRows(d,0);busy=false}
  /* ---- wiring ---- */
- head.onclick=()=>setOpen(!isOpen);
+ head.onclick=()=>isOpen?close():setOpen(true);
  head.addEventListener("pointerdown",()=>animate(chev,{scale:.88},SNAP));["pointerup","pointerleave"].forEach(t=>head.addEventListener(t,()=>animate(chev,{scale:1},SNAP)));
  qIn.oninput=()=>onQuery(qIn.value);
  qIn.onkeydown=e=>{if(e.key==="Escape"&&query){e.preventDefault();onQuery("")}if(e.key==="Enter")e.preventDefault()};
@@ -927,8 +937,9 @@ return function PinAdd(host,onCreate){
  /* ---- mount ---- */
  commit(bar,{height:"0px",opacity:"0"});commit(body,{height:"0px",opacity:"0"});chev.style.transform="rotate(180deg)";
  animate(shell,{opacity:[0,1],y:[24,0],scale:[.96,1]},{...OUT,duration:.5});setTimeout(()=>commit(shell,{opacity:"1",transform:""}),900);
- renderList();renderStack();
- return{refresh(){picked=picked.filter(id=>FR.some(f=>f.id===id));renderStack();if(!picked.length&&barShown)hideBar();renderList()}};
+ renderList();renderStack();if(opts.autoOpen)setTimeout(()=>setOpen(true),160);
+ async function close(){if(confirming)return;if(isOpen)await setOpen(false);opts.onClose?.()}
+ return{close,open:()=>setOpen(true),refresh(){picked=picked.filter(id=>FR.some(f=>f.id===id));renderStack();if(!picked.length&&barShown)hideBar();renderList()}};
 };
 })();
 // ===== end Pin UI =====
@@ -936,4 +947,11 @@ let PM;
 async function createGroup(name,ids){const gid=doc(collection(db,"chats")).id;
  await setDoc(doc(db,"chats",gid),{group:true,name:name.slice(0,40),members:[uid],admin:uid,status:"active",from:uid,last:"",lastFrom:"",updated:serverTimestamp()});
  await Promise.all(ids.map(id=>setDoc(doc(db,"invites",gid+"_"+id),{gid,gname:name,from:uid,fromName:me.name,to:id})))}
+
+// ===== Create New Group popup =====
+function openPop(){const lay=$("#pmpop"),inn=$("#pmin");inn.replaceChildren();lay.hidden=false;PM=PinAdd(inn,createGroup,{autoOpen:true,onClose:closePop})}
+function closePop(){PM=null;$("#pmpop").hidden=true;$("#pmin").replaceChildren()}
+$("#pmopen").onclick=openPop;
+$("#pmpop").onclick=e=>{if(e.target.id==="pmpop"||e.target.id==="pmin")PM?.close()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&PM)PM.close()});
 </script></body></html>
