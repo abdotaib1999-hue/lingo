@@ -262,6 +262,9 @@ html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] inpu
 .pmpop{position:fixed;inset:0;z-index:25;display:flex;overflow:auto;padding:20px 12px;background:rgba(10,16,28,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:pmFade .22s ease-out}
 .pmpop__in{margin:auto;width:100%;display:flex;justify-content:center}
 @keyframes pmFade{from{opacity:0}}
+.hero .err:empty{display:none}
+.pmem__x{display:grid;place-items:center;flex-shrink:0;width:28px;height:28px;border-radius:9999px;color:var(--name)}.pmem__x svg{width:16px;height:16px}
+@media(hover:hover){.pmem__x:hover{background:var(--hover)}}
 </style></head><body><div class="app">
 
 <section id="auth"><div class="pad" style="margin:auto 0">
@@ -328,7 +331,7 @@ html[dir=rtl] input[type=checkbox]::after{left:auto;right:3px}html[dir=rtl] inpu
 
 <section id="home"><header><h1>Lingo<span class="wd">.</span></h1><button class="ib" id="ng" title="New group" data-i="users" hidden></button><button class="ib" id="bell" title="Turn on notifications" data-i="bell"></button><button class="ib" id="mb" title="Profile" data-i="user" hidden></button></header>
 <div class="hero"><div class="ht">Friends and languages</div><div class="frs" id="frs"></div>
-<div class="sb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="un" placeholder="Search chats or add by @username" autocapitalize="none"><button class="ib" id="add" title="Send request" data-i="plus"></button></div>
+
 <p class="err" id="he"></p></div>
 <div class="chips" id="chips"><button class="ch on" data-f="all">All</button><button class="ch" data-f="unread">Unread <b class="cn" id="c1"></b></button><button class="ch" data-f="groups">Groups <b class="cn" id="c2"></b></button><button class="ch" data-f="muted">Muted</button></div>
 <div id="gbar" hidden style="padding:6px 16px 0;display:flex;justify-content:center"><button class="pmbtn" id="pmopen" type="button"><span class="pmbtn__card"><span class="pmbtn__t">Create New Group</span><span class="pmbtn__i" data-i="plus"></span></span></button></div><p class="mu" id="gempty" hidden style="padding:8px 20px">No groups yet. Tap Create New Group to start one.</p>
@@ -447,7 +450,7 @@ const T=[
 ["Friends and languages"],["All"],["Unread"],["Muted"],["Pinned"],["All chats"],["Groups"],["Add"],["Pin chat"],["Copy"],
 ["Name and photo"],["Language"],["Notifications"],["Invite friends"],["About"],["Your photo and name are shown to your friends."],["Choose the language you read and write in."],["Changes here apply right away."],["Notifications are on."],["Notifications are off on this device."],["Lingo lets friends chat in their own languages."],["Animated emoji: Google Noto Emoji Animation (CC BY 4.0)."],["Saved"],["No groups yet. Tap Create New Group to start one."],
 ["Edit"],["edited"],["Editing message"],["Online"],["Last seen"],["Privacy"],["Friends can see when you are online."],["Show when I'm online"],["Notifications on this device"],
-["Create New Group"],["Search friends"],["View all friends"],["Group created"],["selected"],["No friends match your search."]
+["Create New Group"],["Search friends"],["View all friends"],["Group created"],["selected"],["No friends match your search."],["Add a friend"]
 ];
 const DICT={PT:{},FR:{},DE:{}};T.forEach(r=>{DICT.PT[r[0]]=r[1];DICT.FR[r[0]]=r[2];DICT.DE[r[0]]=r[3]});
 let UIL="EN";const _=s=>DICT[UIL]?.[s]||s,EN=new Set(T.map(r=>r[0])),reg=[];
@@ -467,7 +470,7 @@ applyPR();$("#ts").value=PR.ts||16;$("#both").checked=!!PR.both;
 $("#ts").onchange=()=>{PR.ts=+$("#ts").value;savePR()};$("#both").onchange=()=>{PR.both=$("#both").checked;savePR()};
 $("#tip").onclick=()=>{PR.tip=1;savePR();$("#tip").hidden=true};
 $("#vw").onclick=()=>$("#vw").hidden=true;
-$("#un").oninput=()=>applyFilter();
+
 const post=bx=>{const a=[...bx.children];a.forEach((e,i)=>{const f=e.dataset.f;e.classList.toggle("cont",!!f&&a[i-1]?.dataset.f===f);e.classList.toggle("nxt",!!f&&a[i+1]?.dataset.f===f);
  if(f===uid&&e.dataset.t){const tm=e.querySelector(".tm");if(tm)tm.textContent=hm(+e.dataset.t)+(e.dataset.ed?" · "+_("edited"):"")+" "+(cur?.seen>=+e.dataset.t?"✓✓":"✓")}})};
 let uiTok=0;
@@ -532,7 +535,7 @@ function home(){
   FR=[];FC={};const rows=await Promise.all(cs.map(async c=>{const o=c.group?{id:c.id,name:c.name,group:true}:await user(c.members.find(x=>x!==uid));if(!c.group&&c.status==="active"){FR.push(o);FC[o.id]=c}return row(c,o)}));
   $("#list").replaceChildren(...rows);layout();drawFriends();refreshFriends();PM?.refresh();
  });
- const a=new URLSearchParams(location.search).get("add");if(a){history.replaceState(0,"",location.pathname);request(a)}
+ const a=new URLSearchParams(location.search).get("add");if(a){history.replaceState(0,"",location.pathname);request(a).then(ok=>{if(ok)toast(_("Request sent"))})}
 }
 function row(c,o){
  const b=h("button","row"),t=h("div"),pend=c.status==="pending",incoming=pend&&c.from!==uid;
@@ -541,16 +544,15 @@ function row(c,o){
  if(c.lastFrom===uid&&c.status!=="pending"){const k=h("span","tk"),oth=c.members.find(x=>x!==uid);k.innerHTML=svgi("check2");if(!c.group&&(c.seen?.[oth]?.seconds||0)>=(c.updated?.seconds||0))k.style.color="var(--ac)";r.append(k)}b.dataset.n=(o.name||"").toLowerCase();b.append(avw(o,!c.group&&isOn(o)),t,r);
  b.onclick=async()=>{if(pend){if(!incoming)return;await updateDoc(doc(db,"chats",c.id),{status:"active"})}open(c,o)};
  return b}
-async function request(un){
- const e=$("#he");e.textContent="";un=un.trim().replace(/^@/,"").toLowerCase();if(!un)return;
+async function request(un,e){e=e||{};e.textContent="";un=un.trim().replace(/^@/,"").toLowerCase();if(!un)return false;
  try{const s=await getDoc(doc(db,"usernames",un));
-  if(!s.exists())return e.textContent=_("No one has that username.");
-  const o=s.data().uid;if(o===uid)return e.textContent="That's your own username.";
+  if(!s.exists()){e.textContent=_("No one has that username.");return false}
+  const o=s.data().uid;if(o===uid){e.textContent="That's your own username.";return false}
   const id=[uid,o].sort().join("_");
-  if((await getDoc(doc(db,"chats",id))).exists())return e.textContent="You already have a chat with them.";
-  await setDoc(doc(db,"chats",id),{members:[uid,o],status:"pending",from:uid,last:"",updated:serverTimestamp()});$("#un").value="";
- }catch{e.textContent="Could not send the request."}}
-$("#add").onclick=()=>request($("#un").value);$("#un").onkeydown=e=>{if(e.key==="Enter")request($("#un").value)};
+  if((await getDoc(doc(db,"chats",id))).exists()){e.textContent="You already have a chat with them.";return false}
+  await setDoc(doc(db,"chats",id),{members:[uid,o],status:"pending",from:uid,last:"",updated:serverTimestamp()});return true
+ }catch{e.textContent="Could not send the request.";return false}}
+
 const inviteUrl=()=>location.origin+location.pathname+"?add="+me.username;
 $("#inv").onclick=async()=>{await navigator.clipboard.writeText(inviteUrl());$("#inv").textContent=_("Copied!");setTimeout(()=>$("#inv").textContent=_("Copy invite link"),1500)};
 $("#qb").onclick=()=>{const q=qrcode(0,"M");q.addData(inviteUrl());q.make();$("#qrimg").innerHTML=q.createSvgTag({scalable:true});$("#qr").hidden=false};
@@ -751,7 +753,7 @@ let FC={},FLT="all";
 function setFilter(f){FLT=f;document.querySelectorAll("#chips .ch").forEach(c=>c.classList.toggle("on",c.dataset.f===f));$("#t1").classList.toggle("on",f!=="groups");$("#t2").classList.toggle("on",f==="groups");$("#gbar").hidden=f!=="groups";applyFilter()}
 document.querySelectorAll("#chips .ch").forEach(c=>c.onclick=()=>setFilter(c.dataset.f));
 $("#t1").onclick=()=>setFilter("all");$("#t2").onclick=()=>setFilter("groups");$("#t3").onclick=()=>openSetup(true,me);
-function applyFilter(){const q=$("#un").value.trim().replace(/^@/,"").toLowerCase();let head=null,vis=0;
+function applyFilter(){const q=SQ;let head=null,vis=0;
  [...$("#list").children].forEach(e=>{if(e.classList.contains("sc")){head=e;e._n=0;return}if(!e.classList.contains("row"))return;
   const d=e.dataset,ok=(FLT==="all"||(FLT==="unread"&&d.u==="1")||(FLT==="groups"&&d.g==="1")||(FLT==="muted"&&d.m==="1"))&&(!q||(d.n||"").includes(q));
   e.hidden=!ok;if(ok){vis++;if(head)head._n++}});
@@ -760,7 +762,7 @@ function layout(){const L2=$("#list"),rs=[...L2.querySelectorAll(".row")],pins=P
  if(pr.length)kids.push(mk("Pinned"),...pr);kids.push(mk("All chats"),...ot);
  L2.replaceChildren(...(rs.length?kids:[Object.assign(h("p","mu",_("No chats yet. Add a friend by username or share your invite link.")),{style:"padding:20px"})]));
  $("#c1").textContent=rs.filter(r=>r.dataset.u==="1").length||"";$("#c2").textContent=rs.filter(r=>r.dataset.g==="1").length||"";applyFilter()}
-function drawFriends(){const box=$("#frs"),ad=h("button","fr add"),ai=h("div","av");ai.innerHTML=svgi("plus");ad.append(ai,h("span","",_("Add")));ad.onclick=()=>$("#un").focus();
+function drawFriends(){const box=$("#frs"),ad=h("button","fr add"),ai=h("div","av");ai.innerHTML=svgi("plus");ad.append(ai,h("span","",_("Add")));ad.onclick=openAdd;
  box.replaceChildren(ad,...FR.slice(0,8).map(f=>{const b=h("button","fr"),l=(f.lang||"").split("-")[0];b.dataset.o=f.id;b.append(avw(f,isOn(f)),h("span","fn",(f.name||"").split(" ")[0]),h("small","fl",l));b.onclick=()=>open(FC[f.id],f);return b}))}
 $("#pin").onchange=()=>{const a=new Set(PR.pins||[]);$("#pin").checked?a.add(cur.id):a.delete(cur.id);PR.pins=[...a];savePR();layout()};
 function openMsg({d,m,x,mine,rep,cid}){const sh=$("#ms"),mr=m.rx?.[uid];
@@ -949,9 +951,28 @@ async function createGroup(name,ids){const gid=doc(collection(db,"chats")).id;
  await Promise.all(ids.map(id=>setDoc(doc(db,"invites",gid+"_"+id),{gid,gname:name,from:uid,fromName:me.name,to:id})))}
 
 // ===== Create New Group popup =====
-function openPop(){const lay=$("#pmpop"),inn=$("#pmin");inn.replaceChildren();lay.hidden=false;PM=PinAdd(inn,createGroup,{autoOpen:true,onClose:closePop})}
-function closePop(){PM=null;$("#pmpop").hidden=true;$("#pmin").replaceChildren()}
+function openPop(){const lay=$("#pmpop"),inn=$("#pmin");inn.replaceChildren();lay.hidden=false;PM=PinAdd(inn,createGroup,{autoOpen:true,onClose:closePop});POP=PM}
+function closePop(){PM=null;POP=null;$("#pmpop").hidden=true;$("#pmin").replaceChildren()}
 $("#pmopen").onclick=openPop;
-$("#pmpop").onclick=e=>{if(e.target.id==="pmpop"||e.target.id==="pmin")PM?.close()};
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&PM)PM.close()});
+$("#pmpop").onclick=e=>{if(e.target.id==="pmpop"||e.target.id==="pmin")POP?.close()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&POP)POP.close()});
+
+// ===== Add a friend popup (same popup layer as Create New Group) =====
+let POP=null,SQ="";
+function openAdd(){
+ const lay=$("#pmpop"),inn=$("#pmin");inn.replaceChildren();lay.hidden=false;
+ const root=h("div","pmem");
+ root.innerHTML=`<div class="pmem__shell" style="padding-bottom:10px"><div class="pmem__card"><div class="pmem__head"><span class="pmem__title"></span><button class="pmem__x" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button></div>
+<div class="pmem__search"><svg class="pmem__searchIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="pmem__searchInput" autocapitalize="none" autocomplete="off" spellcheck="false"></div>
+<p class="pmem__msg"></p><div class="pmem__actionIn" style="border-top:0;margin-top:0;padding-top:4px;justify-content:flex-end"><button class="pmem__cta" type="button"></button></div></div></div>`;
+ const q=s=>root.querySelector(s),shell=q(".pmem__shell"),inp=q("input"),msg=q(".pmem__msg"),cta=q(".pmem__cta");
+ q(".pmem__title").textContent=_("Add a friend");inp.placeholder=_("Add a friend by @username");cta.textContent=_("Send request");
+ const close=()=>{lay.hidden=true;inn.replaceChildren();if(POP&&POP.close===close)POP=null};POP={close};
+ const go=async()=>{if(cta.disabled)return;const un=inp.value.trim();if(!un){inp.focus();return}
+  cta.disabled=true;const ok=await request(un,msg);cta.disabled=false;
+  if(ok){cta.classList.add("is-done");cta.disabled=true;cta.textContent=_("Request sent");setTimeout(close,1100)}};
+ q(".pmem__x").onclick=close;cta.onclick=go;inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();go()}};inp.oninput=()=>{msg.textContent=""};
+ inn.append(root);
+ const A=window.Motion&&window.Motion.animate;if(A)A(shell,{opacity:[0,1],y:[24,0],scale:[.96,1]},{duration:.5,ease:[.22,1,.36,1]});
+ setTimeout(()=>{shell.style.opacity="1";shell.style.transform=""},900);setTimeout(()=>inp.focus(),400)}
 </script></body></html>
